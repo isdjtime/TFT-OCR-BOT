@@ -1,65 +1,48 @@
-![main](https://i.imgur.com/roX0N3C.png)
+## 说明:
 
-## NOTES:
-- Make sure you don't have any overlays on (Blitz, Mobalytics, etc.).
-- League & client must be in English.
-- 16:9 resolution borderless windowed is required in League, the game must also be on the main monitor ~~(Use 1920x1080 for best results).~~
-- Due to some adjustments by Riot, other resolutions are not exactly scaled versions of 1080p, so now **only support 1920x1080 borderless window.**
-- If the program crashes or not working, please read the FAQ first. If the issue still cannot be resolved, then create an issue with the error.
+- 确保游戏界面没有任何窗口覆盖。
+- 游戏和客户端必须设置为中文。
+- 游戏需要16:9分辨率无边界窗口，游戏也必须在**主显示器**上
+- 由于拳头公司的特性，英雄联盟在其他分辨率并不是1080p的缩放版本，所以现在**只支持1920x1080的无边界窗口**
+- 如果程序崩溃或无法工作，请先阅读FAQ。如果问题仍然无法解决，~~网上冲浪解决（~~
 
-## INSTALLATION:
-1. Install Python 3.11.4 from https://www.python.org/downloads/windows/
-   - Note that Python 3.11.4 cannot be used on Windows 7 or earlier.
-2. Clone the repository or download it from here https://github.com/jfd02/TFT-OCR-BOT/archive/refs/heads/main.zip
-3. Install tesseract 5.3.1.20230401 using the Windows installer available at: https://github.com/UB-Mannheim/tesseract/wiki
-   - Note the tesseract path from the installation.
-   - Set Tesseract tessdata folder path in settings.py file (probably already correct)
-4. Download tesserocr v2.6.0 to the bot folder via: https://github.com/simonflueckiger/tesserocr-windows_build/releases
-   - Please note that the version must be 2.6.0 to be compatible with tesseract 5.3.1
-   - Select the installation file for either 3.10 or 3.11 based on the Python version you are currently using
-   - The file name should be either tesserocr-2.6.0-cp311-cp311-win_amd64.whl or its corresponding to cp310.
-5. Run install.py
-6. Configure settings.py so the league client path is correct
-7. Disable all in-game overlays
-8. Run the main.py file in CMD
+## 安装:
 
-## FEATURES:
-![main](https://i.imgur.com/1bXOmag.png)
-- Read the board state (Round / Level / Gold / Shop / Items)
-- Keeps track of champions on the board and bench
-- Pick a random item/champ from the carousel
-- Pickup items from the board after PVE rounds
-- Place correct items onto champions
-- Plays the user-defined team comp
-- Auto queue using the LCU API
-- Comp editor with GUI
+1. 从 https://www.python.org/downloads/release/python-3114/ 安装Python3.11.4
+- 请注意，Python 3.11.4不能在Windows 7及更早版本上使用。
+2. 克隆存储库或从这里下载https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip 
+3. 运行 `python install.py` 安装依赖。
+7. 禁用所有游戏内的覆盖
+8. 在CMD中运行main.py文件
 
-## Comp Editor
+## 功能:
+- 读取棋盘状态(回合/等级/金币/商店/物品)
+- 跟踪棋盘上和备战区上的英雄信息
+- 从选秀中随机选择一个物品和英雄
+- 在PVE回合后从棋盘上拾取战利品
+- 在英雄身上放置预设装备
+- 玩家自定义阵容
+- 使用LCU接口自动排队
+- 带有GUI的英雄阵容编辑器
+## 阵容编辑：
 
-**Note:** Make sure you have a valid `comps.py` file (copy the one from the repo if you get syntax errors)!
+**注意:** 确保你有一个有效的`comps.py`文件(如果有语法错误，请从仓库中复制一个)!
 
-Open by clicking the file or executing from a terminal with `python comp_editor.py` (in the correct folder).
+单击文件打开，或者在终端中使用`python comp_editor.py`(在正确的文件夹中)执行。
 
-![main](https://i.imgur.com/3e6hKFp.png)
-
-## TODO:
-- Implement tome of traits logic
-- Revamp the gold spending function
-- Revamp auto queue to have more safety checks / fail-safes
-- Grab the best compositions from TFT website
-- Intelligent carousel item selection
-- Change item pickup to be based on the coordinates of orbs
+## 待开发:
+- 优先使用相同羁绊过度
+- 更好的金币消费模式
+- 更好的自动匹配对局和故障监控
+- 从TFT阵容网站上抓取最好的阵容
+- 智能的选秀
+- 更改拾取战利品为定位球体
+- 更好的GUI阵容编辑器
 
 ## FAQ:
-> ModuleNotFoundError: No module named 'win32gui'
-- Open the command prompt (cmd) and run 'pip install pywin32'.
-> I double clicked main.py, a window popped up and closed instantly.
-- Open the command prompt (cmd), drag and drop main.py into it, and then press Enter to run it.
-> The bot said it is moving, buying, and selling champions, but nothing is happening.
-- Open the command prompt (cmd) with admin privileges.
-> Client not open! Trying again in 10 seconds.
-- Check if your game path is correct and open League of Legends by yourself.
-> RuntimeError: Failed to init API, possibly an invalid tessdata path.
-- You don't need to change the TESSDATA_PATH in settings.py if you didn't modify the destination folder while installing Tesseract.
-> ImportError: DLL load failed while importing _tesserocr: The specified module could not be found.
-- Download and install vc_redist : https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
+> ModuleNotFoundError:没有名为` win32gui `的模块
+- 打开命令提示符(cmd)并运行` pip install pywin32 `。
+> 我双击main.py，弹出一个黑窗口并立即关闭。
+- 打开命令提示符(cmd)，将main.py拖放到其中，然后按回车运行它。
+> 机器人表示，它正在移动、购买和销售冠军，但什么也没有发生。
+- 以管理员权限打开命令提示符(cmd)。

@@ -1,12 +1,13 @@
 """
-Handles the board / bench state inside of the game and
-other variables used by the bot to make decisions
+处理游戏内部的棋盘/备战区状态
+机器人用于决策的其他变量
 """
 
 from time import sleep
 import game_assets
 import mk_functions
 import screen_coords
+import settings
 from champion import Champion
 import comps
 import ocr
@@ -15,7 +16,9 @@ import arena_functions
 
 
 class Arena:
-    """Arena class that handles game logic such as board and bench state"""
+    """
+       Arena类，处理游戏逻辑，如棋盘和备战区状态
+    """
 
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     def __init__(self, message_queue) -> None:
@@ -35,7 +38,7 @@ class Arena:
         self.spam_roll = False
 
     def fix_bench_state(self) -> None:
-        """Iterates through bench and fixes invalid slots"""
+        """遍历备战区并修复未知的槽位"""
         bench_occupied: list = arena_functions.bench_occupied_check()
         for index, slot in enumerate(self.bench):
             if slot is None and bench_occupied[index]:
@@ -43,14 +46,12 @@ class Arena:
                 champ_name: str = arena_functions.valid_champ(
                     ocr.get_text(
                         screenxy=screen_coords.PANEL_NAME_LOC.get_coords(),
-                        scale=3,
-                        psm=7,
-                        whitelist=ocr.ALPHABET_WHITELIST,
+                        scale=3
                     )
                 )
                 if self.champs_to_buy.get(champ_name, 0) > 0:
                     print(
-                        f"  The unknown champion {champ_name} exists in comps, keeping it."
+                        f"  备战区[{champ_name}]存在升星队列中"
                     )
                     self.bench[index] = Champion(
                         name=champ_name,
@@ -63,7 +64,7 @@ class Arena:
                     self.champs_to_buy[champ_name] -= 1
                 else:
                     print(
-                        f"  The unknown champion {champ_name} not exists in comps, selling it."
+                        f" 备战区[{champ_name}]不在升星队列中"
                     )
                     self.bench[index] = "?"
                 continue
@@ -74,7 +75,9 @@ class Arena:
                 self.bench[index] = None
 
     def bought_champion(self, name: str, slot: int) -> None:
-        """Purchase champion and creates champion instance"""
+        """
+            购买英雄 并创建英雄实例
+        """
         self.bench[slot] = Champion(
             name=name,
             coords=screen_coords.BENCH_LOC[slot].get_coords(),
@@ -88,20 +91,20 @@ class Arena:
         self.fix_bench_state()
 
     def have_champion(self) -> Champion | None:
-        """Checks the bench to see if champion exists"""
+        """检测备战区是否存在英雄"""
         return next(
             (
                 champion
                 for champion in self.bench
                 if isinstance(champion, Champion)
-                and champion.name not in self.board_names
+                   and champion.name not in self.board_names
             ),
             None,
         )
 
     def move_known(self, champion: Champion) -> None:
-        """Moves champion to the board"""
-        print(f"  Moving {champion.name} to board")
+        """将英雄移动到棋盘上"""
+        print(f"  移动[{champion.name}]到棋盘")
         destination: tuple = screen_coords.BOARD_LOC[
             comps.COMP[champion.name]["board_position"]
         ].get_coords()
@@ -116,10 +119,10 @@ class Arena:
         self.board_size += champion.size
 
     def move_unknown(self) -> None:
-        """Moves unknown champion to the board"""
+        """将未识别的英雄移动到棋盘上"""
         for index, champion in enumerate(self.bench):
             if isinstance(champion, str):
-                print(f"  Moving {champion} to board")
+                print(f"  移动 {champion} 到棋盘")
                 mk_functions.left_click(screen_coords.BENCH_LOC[index].get_coords())
                 sleep(0.1)
                 mk_functions.left_click(
@@ -133,17 +136,17 @@ class Arena:
                 return
 
     def sell_bench(self) -> None:
-        """Sells all of the champions on the bench"""
+        """出售备战区所有英雄"""
         for index, _ in enumerate(self.bench):
             mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
             self.bench[index] = None
 
     def unknown_in_bench(self) -> bool:
-        """Sells all of the champions on the bench"""
+        """出售备战区所有英雄"""
         return any(isinstance(slot, str) for slot in self.bench)
 
     def move_champions(self) -> None:
-        """Moves champions to the board"""
+        """将英雄移动到棋盘上"""
         self.level: int = arena_functions.get_level()
         while self.level > self.board_size:
             champion: Champion | None = self.have_champion()
@@ -157,11 +160,11 @@ class Arena:
                 for champion in shop:
                     gold: int = arena_functions.get_gold()
                     valid_champ: bool = (
-                        champion[1] in game_assets.CHAMPIONS
-                        and game_assets.champion_gold_cost(champion[1]) <= gold
-                        and game_assets.champion_board_size(champion[1]) == 1
-                        and self.champs_to_buy.get(champion[1], -1) < 0
-                        and champion[1] not in self.board_unknown
+                            champion[1] in game_assets.CHAMPIONS
+                            and game_assets.champion_gold_cost(champion[1]) <= gold
+                            and game_assets.champion_board_size(champion[1]) == 1
+                            and self.champs_to_buy.get(champion[1], -1) < 0
+                            and champion[1] not in self.board_unknown
                     )
 
                     if valid_champ:
@@ -176,12 +179,12 @@ class Arena:
                         break
 
                 if not bought_unknown:
-                    print("  Need to sell entire bench to keep track of board")
+                    print("  需清空备战区初始化")
                     self.sell_bench()
                     return
 
     def replace_unknown(self) -> None:
-        """Replaces unknown champion"""
+        """替换掉未识别的英雄"""
         champion: Champion | None = self.have_champion()
         if len(self.board_unknown) > 0 and champion is not None:
             mk_functions.press_e(
@@ -194,51 +197,53 @@ class Arena:
             self.move_known(champion)
 
     def bench_cleanup(self) -> None:
-        """Sells unknown champions"""
+        """出售未识别的英雄"""
         self.anvil_free: list[bool] = [False] * 9
         for index, champion in enumerate(self.bench):
             if champion == "?" or isinstance(champion, str):
-                print("  Selling unknown champion")
+                print("  出售英雄")
                 mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
                 self.bench[index] = None
                 self.anvil_free[index] = True
             elif isinstance(champion, Champion):
                 if (
-                    self.champs_to_buy.get(champion.name, -1) < 0
-                    and champion.name in self.board_names
+                        self.champs_to_buy.get(champion.name, -1) < 0
+                        and champion.name in self.board_names
                 ):
-                    print("  Selling unknown champion")
+                    print("  出售英雄")
                     mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
                     self.bench[index] = None
                     self.anvil_free[index] = True
 
     def clear_anvil(self) -> None:
-        """Clears anvil on the bench, selects middle item"""
+        print("----------------clear_anvil---------------")
+        """消耗掉 备战区的武器库 (铁砧)"""
         for index, champion in enumerate(self.bench):
             if champion is None and not self.anvil_free[index]:
                 mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
         sleep(0.5)
         anvil_msg: str = ocr.get_text(
             screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
-            scale=3,
-            psm=7,
-            whitelist=ocr.ALPHABET_WHITELIST,
+            scale=3
         )
-        if anvil_msg == "ChooseOne":
-            print("  Clear anvil")
+        if anvil_msg == "选择一件":
+            print("  处理备战区武器库")
             mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
             sleep(1)
 
     def place_items(self) -> None:
-        """Iterates through items and tries to add them to champion"""
+        """
+            尝试遍历我的装备 并合成给英雄单位
+        """
         self.items = arena_functions.get_items()
-        print(f"  Items: {list(filter((None).__ne__, self.items))}")
+        print(f"  装备: {list(filter((None).__ne__, self.items))}")
         for index, _ in enumerate(self.items):
             if self.items[index] is not None:
                 self.add_item_to_champs(index)
 
     def add_item_to_champs(self, item_index: int) -> None:
-        """Iterates through champions in the board and checks if the champion needs items"""
+        """遍历棋盘中的英雄并检查英雄是否需要该装备"""
+        # TODO 英雄复制器逻辑
         for champ_name in comps.COMP:
             for champ in self.board:
                 if champ_name == champ.name:
@@ -247,7 +252,7 @@ class Arena:
                     break
 
     def add_item_to_champ(self, item_index: int, champ: Champion) -> None:
-        """Takes item index and champ and applies the item"""
+        """获取物品的index和champ并装备该装备"""
         item = self.items[item_index]
         if item in game_assets.FULL_ITEMS:
             if item in champ.build:
@@ -255,7 +260,7 @@ class Arena:
                     screen_coords.ITEM_POS[item_index][0].get_coords()
                 )
                 mk_functions.left_click(champ.coords)
-                print(f"  Placed {item} on {champ.name}")
+                print(f"  装备 {item} 给 {champ.name}")
                 champ.completed_items.append(item)
                 champ.build.remove(item)
                 self.items[self.items.index(item)] = None
@@ -275,7 +280,7 @@ class Arena:
                     screen_coords.ITEM_POS[item_index][0].get_coords()
                 )
                 mk_functions.left_click(champ.coords)
-                print(f"  Placed {item} on {champ.name}")
+                print(f"  装备 {item} 给 {champ.name}")
                 self.items[self.items.index(item)] = None
         else:
             for builditem in champ.current_building:
@@ -287,12 +292,12 @@ class Arena:
                     champ.completed_items.append(builditem[0])
                     champ.current_building.clear()
                     self.items[self.items.index(item)] = None
-                    print(f"  Placed {item} on {champ.name}")
-                    print(f"  Completed {builditem[0]}")
+                    print(f"  装备 {item} 给 {champ.name}")
+                    print(f"  合成 {builditem[0]}")
                     return
 
     def fix_unknown(self) -> None:
-        """Checks if the item passed in arg one is valid"""
+        """检查参数1中传递的项是否有效"""
         sleep(0.25)
         mk_functions.press_e(
             screen_coords.BOARD_LOC[self.unknown_slots[0]].get_coords()
@@ -301,7 +306,7 @@ class Arena:
         self.board_size -= 1
 
     def remove_champion(self, champion: Champion) -> None:
-        """Remove the specify champion in both board and bench"""
+        """移除棋盘和备战区上的指定英雄"""
         for index, slot in enumerate(self.bench):
             if isinstance(slot, Champion) and slot.name == champion.name:
                 mk_functions.press_e(slot.coords)
@@ -316,69 +321,74 @@ class Arena:
         self.board.remove(champion)
 
     def final_comp_check(self) -> None:
-        """Checks the board and replaces champions not in final comp"""
+        """检查棋盘并替换没有进入决赛的英雄"""
         for slot in self.bench:
             if (
-                isinstance(slot, Champion)
-                and slot.final_comp
-                and slot.name not in self.board_names
+                    isinstance(slot, Champion)
+                    and slot.final_comp
+                    and slot.name not in self.board_names
             ):
                 for champion in self.board:
                     if not champion.final_comp and champion.size == slot.size:
-                        print(f"  Replacing {champion.name} with {slot.name}")
+                        print(f"  更换 {champion.name} 为 {slot.name}")
                         self.remove_champion(champion)
                         self.move_known(slot)
                         break
 
     def tacticians_crown_check(self) -> None:
-        """Checks if the item from carousel is tacticians crown"""
+        print("-----------------tacticians_crown_check-----------------")
+        """检测是否从选秀界面获取一个金铲铲冠冕装备"""
         mk_functions.move_mouse(screen_coords.ITEM_POS[0][0].get_coords())
         sleep(0.5)
         item: str = ocr.get_text(
             screenxy=screen_coords.ITEM_POS[0][1].get_coords(),
-            scale=3,
-            psm=7,
-            whitelist=ocr.ALPHABET_WHITELIST,
+            scale=3
         )
         item: str = arena_functions.valid_item(item)
         try:
-            if "TacticiansCrown" in item:
-                print("  Tacticians Crown on bench, adding extra slot to board")
+            if ("金铲铲冠冕" in item) or ("金锅锅冠冕" in item) or ("金锅铲冠冕" in item):
+                print("  操作 ==> board_size-= 1")
                 self.board_size -= 1
             else:
-                print(f"{item} is not TacticiansCrown")
+                print(f"{item} 不是冠冕")
         except TypeError:
-            print("  Item could not be read for Tacticians Check")
+            print("  备战区无法获取英雄信息")
 
     def spend_gold(self, speedy=False) -> None:
-        """Spends gold every round"""
+        print("-----------------spend_gold-----------------")
+        # New Wand Buff 购买
+        self.pick_wand()
+        """每回合都消费金币"""
         first_run = True
-        min_gold = 100 if speedy else (24 if self.spam_roll else 56)
+        min_gold = 100 if speedy else (settings.MIN_GOLD if self.spam_roll else settings.MAX_GOLD)
         while first_run or arena_functions.get_gold() >= min_gold:
             if not first_run:
                 if arena_functions.get_level() != 10:
                     mk_functions.buy_xp()
-                    print("  Purchasing XP")
-                mk_functions.reroll()
-                print("  Rerolling shop")
-            shop: list = arena_functions.get_shop()
+                    print("  购买经验")
 
+
+
+                mk_functions.reroll()
+                print("  刷新商店")
+            shop: list = arena_functions.get_shop()
+            # New Wand Buff 购买
+            self.pick_wand()
             # For set 11 encounter round shop delay and choose items popup
             for _ in range(15):
                 if speedy:
                     break
                 if all(champ[1] == "" for champ in shop):
-                    print("  Waiting encounter round animation ends")
+                    print("  奥恩商店～(∠・ω< )⌒☆")
                     sleep(1)
                     anvil_msg: str = ocr.get_text(
-                    screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
-                    scale=3,
-                    psm=7,
-                    whitelist=ocr.ALPHABET_WHITELIST,
+                        screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
+                        scale=3
+
                     )
-                    if anvil_msg in ["ChooseOne", "Feelinglucky"]:
+                    if anvil_msg in ["选择一件", "手气不错"]:
                         sleep(2)
-                        print("  Choosing item")
+                        print("  选择装备")
                         mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
                         sleep(1.5)
                         shop: list = arena_functions.get_shop()
@@ -387,29 +397,31 @@ class Arena:
                 else:
                     break
 
-            print(f"  Shop: {shop}")
+            print(f"  商店: {shop}")
             for champion in shop:
                 if (
-                    self.champs_to_buy.get(champion[1], -1) >= 0
-                    and arena_functions.get_gold()
-                    - game_assets.CHAMPIONS[champion[1]]["Gold"]
-                    >= 0
+                        self.champs_to_buy.get(champion[1], -1) >= 0
+                        and arena_functions.get_gold()
+                        - game_assets.CHAMPIONS[champion[1]]["Gold"]
+                        >= 0
                 ):
                     self.buy_champion(champion, 1)
             first_run = False
 
     def buy_champion(self, champion, quantity) -> None:
-        """Buy champion in shop"""
+
+
+        """从商店购买英雄"""
         none_slot: int = arena_functions.empty_slot()
         if none_slot != -1:
             mk_functions.left_click(screen_coords.BUY_LOC[champion[0]].get_coords())
-            print(f"    Purchased {champion[1]}")
+            print(f"    购买 {champion[1]}")
             self.bought_champion(champion[1], none_slot)
             if champion[1] in self.champs_to_buy:
                 self.champs_to_buy[champion[1]] -= quantity
         else:
             # Try to buy champ 3 when bench is full
-            print(f"  Board is full but want {champion[1]}")
+            print(f"  备战区快满了但缺少: {champion[1]}")
             mk_functions.left_click(screen_coords.BUY_LOC[champion[0]].get_coords())
             game_functions.default_pos()
             sleep(0.5)
@@ -417,40 +429,50 @@ class Arena:
             none_slot = arena_functions.empty_slot()
             sleep(0.5)
             if none_slot != -1:
-                print(f"    Purchased {champion[1]}")
+                print(f"    购买 {champion[1]}")
                 if champion[1] in self.champs_to_buy:
                     self.champs_to_buy[champion[1]] -= quantity
 
     def buy_xp_round(self) -> None:
-        """Buys XP if gold is equals or over 4"""
+        """当金币等于或超过预定值时购买经验 4"""
         if arena_functions.get_gold() >= 4:
             mk_functions.buy_xp()
 
+    def pick_wand(self) -> None:
+        """从用户定义的魔杖优先级列表中选择一个"""
+        wand_name: str = arena_functions.get_wand()
+        for potential in comps.WANDS:
+            if potential in wand_name:
+                print(f"  选择魔杖BUFF {wand_name}")
+                mk_functions.left_click(screen_coords.WAND_LOC.get_coords())
+                # return
+
     def pick_augment(self) -> None:
-        """Picks an augment from user defined augment priority list or defaults to the augment that not in AVOID list"""
+        """从用户定义的强化优先级列表中选择一个强化，或者默认为不在避免列表中的强化"""
+
         while True:
             sleep(1)
             augments: list = []
             for coords in screen_coords.AUGMENT_POS:
                 augment: str = ocr.get_text(
-                    screenxy=coords.get_coords(), scale=3, psm=7
+                    screenxy=coords.get_coords(), scale=3
                 )
                 augments.append(augment)
-            print(f"  Augments: {augments}")
+            print(f"  强化符文: {augments}")
             if len(augments) == 3 and "" not in augments:
                 break
 
         for potential in comps.AUGMENTS:
             for augment in augments:
                 if potential in augment:
-                    print(f"  Choosing augment {augment}")
+                    print(f"  选择强化符文 {augment}")
                     mk_functions.left_click(
                         screen_coords.AUGMENT_LOC[augments.index(augment)].get_coords()
                     )
                     return
 
         if self.augment_roll:
-            print("  Rolling for augment")
+            print("  刷新强化符文")
             for i in range(0, 3):
                 mk_functions.left_click(screen_coords.AUGMENT_ROLL[i].get_coords())
             self.augment_roll = False
@@ -458,7 +480,7 @@ class Arena:
             return
 
         print(
-            "  [!] No priority or backup augment found, undefined behavior may occur for the rest of the round"
+            "  [!] 没有匹配预设强化符文,默认选择第一个"
         )
 
         for augment in augments:
@@ -475,18 +497,18 @@ class Arena:
         mk_functions.left_click(screen_coords.AUGMENT_LOC[0].get_coords())
 
     def check_health(self) -> None:
-        """Checks if current health is below 30 and conditionally activates spam roll"""
+        """生命值低于 settings.HEALTH, 梭哈"""
         health: int = arena_functions.get_health()
         if health > 0:
-            print(f"  Health: {health}")
-            if not self.spam_roll and health < 30:
-                print("    Health under 30, spam roll activated")
+            print(f"  生命值: {health}")
+            if not self.spam_roll and health < settings.HEALTH:
+                print("    生命值低于安全值,开始梭哈")
                 self.spam_roll = True
         else:
-            print("  Health check failed")
+            print("  获取生命值失败")
 
     def get_label(self) -> None:
-        """Gets labels used to display champion name UI on window"""
+        """获取用于在窗口上显示英雄名称UI的标签"""
         labels: list = [
             (f"{slot.name}", slot.coords)
             for slot in self.bench

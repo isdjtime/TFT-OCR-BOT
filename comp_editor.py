@@ -1,7 +1,5 @@
 """
-CompEditor Application
-
-This script defines a Tkinter-based GUI application for editing champion compositions.
+阵容编辑器
 """
 
 import tkinter as tk
@@ -17,29 +15,29 @@ ITEM_OPTIONS = list(FULL_ITEMS.keys())
 
 class CompEditor(tk.Tk):
     """
-    Class representing the CompEditor application.
+    阵容编辑类
 
-    Attributes:
-        comp_tree (ttk.Treeview): Treeview widget for displaying champion details.
-        COMP (dict): Dictionary containing champion data.
-        trait_vars (list): List of StringVar instances for trait dropdowns.
+    属性:
+        comp_tree (ttk.Treeview): Treeview小部件，用于显示冠军详情
+        COMP (dict): 英雄数据字典
+        trait_vars (list): 特征下拉列表的StringVar实例。
     """
 
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     def __init__(self, comp_data):
         super().__init__()
 
-        self.title("Comp Editor")
+        self.title("阵容编辑器")
         self.geometry("1280x720")
 
         self.comp_tree = ttk.Treeview(
             self, columns=("board_position", "level", "items", "final_comp")
         )
-        self.comp_tree.heading("#0", text="Champion")
-        self.comp_tree.heading("board_position", text="Board Position")
-        self.comp_tree.heading("level", text="Level")
-        self.comp_tree.heading("items", text="Items")
-        self.comp_tree.heading("final_comp", text="Final Comp")
+        self.comp_tree.heading("#0", text="英雄")
+        self.comp_tree.heading("board_position", text="上场位置")
+        self.comp_tree.heading("level", text="英雄等级")
+        self.comp_tree.heading("items", text="装备")
+        self.comp_tree.heading("final_comp", text="是否成型英雄")
         self.comp_tree.grid(row=0, column=1, rowspan=8, sticky="nsew")
 
         self.comp = comp_data
@@ -60,16 +58,16 @@ class CompEditor(tk.Tk):
 
         self.board_position_var = tk.StringVar()
         self.create_label_entry(
-            left_frame, "Board Position:", self.board_position_var, row=1
+            left_frame, "上场位置:", self.board_position_var, row=1
         )
 
         self.level_var = tk.StringVar()
-        self.create_label_entry(left_frame, "Level:", self.level_var, row=2)
+        self.create_label_entry(left_frame, "英雄等级:", self.level_var, row=2)
 
         self.item_dropdowns = []
         for i in range(3):
             item_var = tk.StringVar()
-            item_label = f"Item {i+1}:"
+            item_label = f"装备位置 {i+1}:"
             item_dropdown = ttk.Combobox(
                 left_frame, textvariable=item_var, values=[""] + ITEM_OPTIONS
             )
@@ -81,12 +79,12 @@ class CompEditor(tk.Tk):
 
         self.final_comp_var = tk.BooleanVar()
         self.create_checkbox(
-            left_frame, "Final Composition:", self.final_comp_var, row=9
+            left_frame, "是否成型英雄", self.final_comp_var, row=9
         )
 
         self.add_button = tk.Button(
             left_frame,
-            text="Add Champion",
+            text="添加英雄",
             command=self.add_champion,
             state=tk.DISABLED,
         )
@@ -94,12 +92,12 @@ class CompEditor(tk.Tk):
 
         # Right side (Remove Champion)
         remove_button = tk.Button(
-            self, text="Remove Champion", command=self.remove_champion
+            self, text="删除英雄", command=self.remove_champion
         )
         remove_button.grid(row=8, column=1, sticky="e", pady=10, padx=10)
 
         # Save button
-        save_button = tk.Button(self, text="Save", command=self.save_changes)
+        save_button = tk.Button(self, text="保存阵容", command=self.save_changes)
         save_button.grid(row=2, column=0, sticky="e", pady=10, padx=10)
 
         # Configure grid weights for resizing
@@ -128,7 +126,7 @@ class CompEditor(tk.Tk):
         details = self.comp.get(champion)
 
         if details is None:
-            print(f"Champion '{champion}' not found in comp.")
+            print(f"英雄 '{champion}' 未找到.")
             return
 
         # Set champion name
@@ -391,7 +389,7 @@ class CompEditor(tk.Tk):
 
         comp_line_start = file_content.find("COMP = {")
         if comp_line_start == -1:
-            print("Error: COMP variable not found in the file.")
+            print("Error: 文件中未找到COMP变量")
             return
 
         comp_line_end = comp_line_start

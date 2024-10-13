@@ -1,5 +1,5 @@
 """
-Handles tasks that happen each game round
+处理每轮游戏中发生的任务
 """
 
 from time import sleep, perf_counter
@@ -16,9 +16,8 @@ from arena import Arena
 from vec4 import Vec4
 from vec2 import Vec2
 
-
 class Game:
-    """Game class that handles game logic such as round tasks"""
+    """Game类，处理游戏逻辑，如轮任务"""
 
     def __init__(self, message_queue: multiprocessing.Queue) -> None:
         importlib.reload(game_assets)
@@ -29,17 +28,17 @@ class Game:
         self.forfeit_time: int = settings.FORFEIT_TIME + random.randint(50, 150)
         self.found_window = False
 
-        print("\n[!] Searching for game window")
+        print("\n[!] 寻找游戏窗口")
         while not self.found_window:
-            print("  Did not find window, trying again...")
+            print("  没有找到游戏窗口，再次尝试中...")
             win32gui.EnumWindows(self.callback, None)
             sleep(1)
 
         self.loading_screen()
 
     def callback(self, hwnd, extra) -> None:  # pylint: disable=unused-argument
-        """Function used to find the game window and get its size"""
-        if "League of Legends (TM) Client" not in win32gui.GetWindowText(hwnd):
+        """用于查找游戏窗口并获取其大小的函数"""
+        if settings.GAME_HWND_NAME not in win32gui.GetWindowText(hwnd):
             return
 
         rect = win32gui.GetWindowRect(hwnd)
@@ -52,15 +51,15 @@ class Game:
         if width < 200 or height < 200:
             return
 
-        print(f"  Window {win32gui.GetWindowText(hwnd)} found")
-        print(f"    Location: ({x_pos}, {y_pos})")
-        print(f"    Size:     ({width}, {height})")
+        print(f"  游戏窗口[{win32gui.GetWindowText(hwnd)}]已加载")
+        print(f"    起始位置: ({x_pos}, {y_pos})")
+        print(f"    窗口大小:     ({width}, {height})")
         Vec4.setup_screen(x_pos, y_pos, width, height)
         Vec2.setup_screen(x_pos, y_pos, width, height)
         self.found_window = True
 
     def loading_screen(self) -> None:
-        """Loop that runs while the game is in the loading screen"""
+        """循环，当游戏在加载屏幕时运行"""
         game_functions.default_pos()
         while game_functions.get_round()[0] != "1-1":
             if self.check_failed_to_connect_window():
@@ -70,25 +69,25 @@ class Game:
         self.game_loop()
 
     def check_failed_to_connect_window(self) -> bool:
-        """Check "Failed to Connect" windows and try to reconnect"""
+        """检查“连接失败”窗口并尝试重新连接"""
         hwnd = win32gui.FindWindow(None, "Failed to Connect")
         if hwnd:
-            print(' Found "Failed to Connect" window, trying to exit and reconnect')
+            print(' 发现“连接失败”窗口，试图退出并重新连接')
             if reconnect_button := win32gui.FindWindowEx(hwnd, 0, "Button", None):
                 if cancel_button := win32gui.FindWindowEx(
                     hwnd, reconnect_button, "Button", None
                 ):
-                    print("  Exiting the game.")
+                    print("  退出游戏")
                     win32gui.SendMessage(cancel_button, BM_CLICK, 0, 0)
                     return True
-                print("  Cancel button not found.")
+                print("  未找到取消按钮")
             else:
-                print("  Reconnect button not found.")
+                print("  未找到重新连接按钮")
         return False
 
     # pylint: disable=too-many-branches
     def game_loop(self) -> None:
-        """Loop that runs while the game is active, handles calling the correct tasks for round and exiting game"""
+        """在游戏处于活动状态时运行的Loop，处理在循环和退出游戏时调用正确的任务"""
         ran_round: str = None
         last_game_health: int = 100
 
@@ -134,18 +133,18 @@ class Game:
                     self.second_round()
                     ran_round: str = self.round[0]
                 elif self.round[0] in game_assets.ENCOUNTER_ROUNDS:
-                    print(f"\n[Encounter Round] {self.round[0]}")
-                    print("  Do nothing")
+                    print(f"\n[遇到对局] {self.round[0]}")
+                    print("  不执行操作")
                     self.message_queue.put("CLEAR")
                     self.arena.check_health()
                     ran_round: str = self.round[0]
                 if self.round[1] == 1 and self.round[0].split("-")[1] == "1":
-                    print("\n[Encounter round setup]")
+                    print("\n[当前回合]")
                     self.encounter_round_setup()
             sleep(0.5)
 
     def encounter_round_setup(self) -> None:
-        """Remove rounds from game_assets and add it back by checking round message"""
+        """从game_assets中删除轮次，并通过检查轮次消息将其添加回来"""
         game_assets.CAROUSEL_ROUND = {
             carousel_round
             for carousel_round in game_assets.CAROUSEL_ROUND
@@ -172,7 +171,7 @@ class Game:
             if not item_placement_round.startswith(self.round[0].split("-")[0])
         }
         for index, round_msg in enumerate(game_functions.check_encounter_round()):
-            print(f"  Round {self.round[0].split('-')[0]}-{str(index + 1)}: {round_msg.upper()} ROUND")
+            print(f"  回合 {self.round[0].split('-')[0]}-{str(index + 1)}: {round_msg.upper()} 对局")
             if index == 0:
                 continue
             if round_msg == "carousel":
@@ -204,7 +203,7 @@ class Game:
 
     def second_round(self) -> None:
         """Move unknown champion to board after first carousel"""
-        print(f"\n[Second Round] {self.round[0]}")
+        print(f"\n[初始对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         while True:
             result = arena_functions.bench_occupied_check()
@@ -217,19 +216,20 @@ class Game:
 
     def carousel_round(self) -> None:
         """Handles tasks for carousel rounds"""
-        print(f"\n[Carousel Round] {self.round[0]}")
+        print(f"\n[选秀] {self.round[0]}")
         self.message_queue.put("CLEAR")
         if self.round[0] == "3-4":
             self.arena.final_comp = True
         self.arena.check_health()
-        print("  Getting a champ from the carousel")
+        print("  等待选秀结束")
         game_functions.get_champ_carousel(self.round[0])
 
     def pve_round(self) -> None:
         """Handles tasks for PVE rounds"""
-        print(f"\n[PvE Round] {self.round[0]}")
+        print(f"\n[PvE 对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         sleep(0.5)
+
         if self.round[0] in game_assets.AUGMENT_ROUNDS:
             sleep(1)
             self.arena.augment_roll = True
@@ -256,9 +256,10 @@ class Game:
 
     def pvp_round(self) -> None:
         """Handles tasks for PVP rounds"""
-        print(f"\n[PvP Round] {self.round[0]}")
+        print(f"\n[PvP 对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         sleep(0.5)
+
         if self.round[0] in game_assets.AUGMENT_ROUNDS:
             sleep(1)
             self.arena.augment_roll = True
@@ -267,7 +268,7 @@ class Game:
         if self.round[0] in ("2-1", "2-5"):
             self.arena.buy_xp_round()
         if self.round[0] in game_assets.PICKUP_ROUNDS:
-            print("  Picking up items")
+            print("  拾取战利品")
             game_functions.pickup_items()
 
         self.arena.fix_bench_state()

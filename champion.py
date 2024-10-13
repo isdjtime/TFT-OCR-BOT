@@ -1,10 +1,10 @@
 """
-Contains all information related to an individual board slot used by the bot
+包含与机器人使用的单个棋盘槽相关的所有信息
 """
 
 
 class Champion:
-    """Champion class that contains information about a single unit on the board or bench"""
+    """英雄类，包含关于棋盘或备战区上的单个单位的信息"""
 
     # pylint: disable=too-many-instance-attributes,too-few-public-methods,too-many-arguments
 
@@ -19,5 +19,5 @@ class Champion:
         self.final_comp: bool = final_comp
 
     def does_need_items(self) -> bool:
-        """Returns if the champion instance needs items"""
+        """返回 英雄 实例是否需要装备"""
         return len(self.completed_items) != 3 or len(self.build) + len(self.current_building) == 0

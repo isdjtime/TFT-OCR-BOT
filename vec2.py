@@ -1,6 +1,6 @@
 """
-Vector2 that handles point screen coordinates
-Transformations related to the game position & game size happen here
+Vector2，处理点屏幕坐标
+与游戏位置和游戏大小相关的转换发生在这里
 """
 
 

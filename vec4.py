@@ -1,6 +1,6 @@
 """
-Vector4 class that handles box screen coordinates
-Transformations related to the game position & game size happen here
+Vector4类，处理框屏幕坐标
+与游戏位置和游戏大小相关的转换发生在这里
   x,y
    *----------------*
    |                |

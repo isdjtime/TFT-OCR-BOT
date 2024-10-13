@@ -6,8 +6,11 @@ from win32gui import SetWindowLong, GetWindowLong, SetLayeredWindowAttributes
 from win32con import WS_EX_LAYERED, WS_EX_TRANSPARENT, GWL_EXSTYLE
 import screeninfo
 
+import settings
+
+
 class UI:
-    """User interface class that handles drawing labels on the screen during gameplay"""
+    """用户界面类，用于在游戏过程中在屏幕上绘制标签"""
 
     def __init__(self, message_queue: multiprocessing.Queue) -> None:
         self.champ_text: str = UI.rgb_convert((255, 255, 255))
@@ -40,20 +43,20 @@ class UI:
             None,
         )
         if primary_monitor is None:
-            print("No primary monitor found... Using 1920x1080")
+            print("没有找到显示器 请使用 1920x1080 分辨率")
             self.root.geometry("1920x1080")
             return
         self.root.geometry(f'{primary_monitor.width}x{primary_monitor.height}')
 
     def set_clickthrough(self, hwnd: int) -> None:
-        """Uses window API function to make the window clickthrough"""
+        """使用window API函数实现窗口点击"""
         styles: int = GetWindowLong(hwnd, GWL_EXSTYLE)
         styles: int = WS_EX_LAYERED | WS_EX_TRANSPARENT
         SetWindowLong(hwnd, GWL_EXSTYLE, styles)
         SetLayeredWindowAttributes(hwnd, 0, 255, 0x00000001)
 
     def consume_text(self) -> None:
-        """Consumes UI changes from the message queue"""
+        """从消息队列中消耗UI更改"""
         if self.message_queue.empty() is False:
             message = self.message_queue.get()
             if 'CLEAR' in message:
@@ -63,7 +66,7 @@ class UI:
             else:
                 for labels in message[1]:
                     label = tk.Label(self.root, text=f"{labels[0]}", bg=self.transparent, fg=self.champ_text,
-                                     font=("Yu Gothic UI Semibold", 13), bd=0)
+                                     font=(settings.UI_FONT, 13), bd=0)
                     label.place(x=labels[1][0] - 15, y=labels[1][1] + 30)
                     self.label_container.append(label)
 

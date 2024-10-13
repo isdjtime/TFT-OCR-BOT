@@ -1,5 +1,6 @@
 """
 Handles sending input to the game, coords contain a cartesian ordered pair (x, y)
+负责向游戏发送输入，coords包含一个笛卡儿有序对(x, y)
 """
 
 import random
