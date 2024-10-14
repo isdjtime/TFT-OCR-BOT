@@ -3,6 +3,8 @@
 """
 
 import multiprocessing
+
+import settings
 from ui import UI
 import auto_queue
 from game import Game
@@ -21,7 +23,13 @@ if __name__ == "__main__":
     overlay: UI = UI(message_queue)
     game_thread = multiprocessing.Process(target=game_loop, args=(message_queue,))
 
-    print("TFT OCR CN | https://github.com/{未定}")
+    print("TFT OCR BOT | https://github.com/NatureTao/TFT-OCR-BOT")
     print("关闭此窗口,以结束运行程序!")
+    print("加载配置文件 setting.py")
+    if settings.QUEUE_ID == 1100:
+        game_mode = "排位"
+    else:
+        game_mode = "匹配"
+    print("匹配模式:", game_mode)
     game_thread.start()
     overlay.ui_loop()

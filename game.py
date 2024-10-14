@@ -32,7 +32,7 @@ class Game:
         while not self.found_window:
             print("  没有找到游戏窗口，再次尝试中...")
             win32gui.EnumWindows(self.callback, None)
-            sleep(1)
+            sleep(2)
 
         self.loading_screen()
 

@@ -216,7 +216,7 @@ class Arena:
                     self.anvil_free[index] = True
 
     def clear_anvil(self) -> None:
-        print("----------------clear_anvil---------------")
+        # print("----------------clear_anvil---------------")
         """消耗掉 备战区的武器库 (铁砧)"""
         for index, champion in enumerate(self.bench):
             if champion is None and not self.anvil_free[index]:
@@ -243,7 +243,7 @@ class Arena:
 
     def add_item_to_champs(self, item_index: int) -> None:
         """遍历棋盘中的英雄并检查英雄是否需要该装备"""
-        # TODO 英雄复制器逻辑
+
         for champ_name in comps.COMP:
             for champ in self.board:
                 if champ_name == champ.name:
@@ -355,9 +355,8 @@ class Arena:
             print("  备战区无法获取英雄信息")
 
     def spend_gold(self, speedy=False) -> None:
-        print("-----------------spend_gold-----------------")
-        # New Wand Buff 购买
-        self.pick_wand()
+        # print("-----------------spend_gold-----------------")
+
         """每回合都消费金币"""
         first_run = True
         min_gold = 100 if speedy else (settings.MIN_GOLD if self.spam_roll else settings.MAX_GOLD)
@@ -367,13 +366,10 @@ class Arena:
                     mk_functions.buy_xp()
                     print("  购买经验")
 
-
-
                 mk_functions.reroll()
                 print("  刷新商店")
             shop: list = arena_functions.get_shop()
-            # New Wand Buff 购买
-            self.pick_wand()
+
             # For set 11 encounter round shop delay and choose items popup
             for _ in range(15):
                 if speedy:
@@ -406,10 +402,11 @@ class Arena:
                         >= 0
                 ):
                     self.buy_champion(champion, 1)
+            # 魔杖BUFF购买
+            self.pick_wand()
             first_run = False
 
     def buy_champion(self, champion, quantity) -> None:
-
 
         """从商店购买英雄"""
         none_slot: int = arena_functions.empty_slot()
@@ -444,6 +441,7 @@ class Arena:
         for potential in comps.WANDS:
             if potential in wand_name:
                 print(f"  选择魔杖BUFF {wand_name}")
+                sleep(0.5)
                 mk_functions.left_click(screen_coords.WAND_LOC.get_coords())
                 # return
 

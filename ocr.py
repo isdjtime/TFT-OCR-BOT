@@ -43,9 +43,7 @@ def get_text(screenxy: tuple, scale: int) -> str:
     result = ""
     screenshot = ImageGrab.grab(bbox=screenxy)
     resize = image_resize(screenshot, scale)  # 调整图像大小
-
-    resize.save("get_text.png")  # 测试当前图片
-
+    # resize.save("get_text.png")  # 测试当前图片
     array = image_array(resize)  # 将图像转换成数组
     grayscale = image_grayscale(array)  # 图像转换为灰度，使OCR更容易破译字符
     thresholding = image_thresholding(grayscale)  # 将阈值化应用于图像
@@ -56,7 +54,6 @@ def get_text(screenxy: tuple, scale: int) -> str:
             print("异常:", e)
             return ""
 
-
     if result[0] is not None:
         text = result[0][0][1][0].strip()
         if text is not None:
@@ -64,10 +61,10 @@ def get_text(screenxy: tuple, scale: int) -> str:
     return ""
 
 def get_text_from_image(image: ImageGrab.Image) -> str:
-    """从图像中获取文本"""
+    """从图片中获取文本"""
     result = ""
     resize = image_resize(image, 3)  # 调整图像大小
-    image.save("get_text_from_image.png") # 测试当前图片
+    # image.save("get_text_from_image.png") # 测试当前图片
     array = image_array(resize)  # 将图像转换成数组
     grayscale = image_grayscale(array)  # 图像转换为灰度，使OCR更容易破译字符
     thresholding = image_thresholding(grayscale)  # 将阈值化应用于图像

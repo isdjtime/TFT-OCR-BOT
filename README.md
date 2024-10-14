@@ -10,7 +10,7 @@
 
 1. 从 https://www.python.org/downloads/release/python-3114/ 安装Python3.11.4
 - 请注意，Python 3.11.4不能在Windows 7及更早版本上使用。
-2. 克隆存储库或从这里下载https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip 
+2. 克隆存储库或从这里下载 https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip
 3. 运行 `python install.py` 安装依赖。
 7. 禁用所有游戏内的覆盖
 8. 在CMD中运行main.py文件

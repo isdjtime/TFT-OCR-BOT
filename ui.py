@@ -13,7 +13,7 @@ class UI:
     """用户界面类，用于在游戏过程中在屏幕上绘制标签"""
 
     def __init__(self, message_queue: multiprocessing.Queue) -> None:
-        self.champ_text: str = UI.rgb_convert((255, 255, 255))
+        self.champ_text: str = UI.rgb_convert((18,170,156))
         self.transparent: str = UI.rgb_convert((0, 0, 0))
         self.label_container: list = []
         self.message_queue = message_queue

@@ -16,13 +16,11 @@ ITEM_OPTIONS = list(FULL_ITEMS.keys())
 class CompEditor(tk.Tk):
     """
     阵容编辑类
-
     属性:
         comp_tree (ttk.Treeview): Treeview小部件，用于显示冠军详情
         COMP (dict): 英雄数据字典
         trait_vars (list): 特征下拉列表的StringVar实例。
     """
-
     # pylint: disable=too-many-instance-attributes,too-many-public-methods
     def __init__(self, comp_data):
         super().__init__()
@@ -37,7 +35,7 @@ class CompEditor(tk.Tk):
         self.comp_tree.heading("board_position", text="上场位置")
         self.comp_tree.heading("level", text="英雄等级")
         self.comp_tree.heading("items", text="装备")
-        self.comp_tree.heading("final_comp", text="是否成型英雄")
+        self.comp_tree.heading("final_comp", text="不是过度英雄")
         self.comp_tree.grid(row=0, column=1, rowspan=8, sticky="nsew")
 
         self.comp = comp_data
@@ -79,7 +77,7 @@ class CompEditor(tk.Tk):
 
         self.final_comp_var = tk.BooleanVar()
         self.create_checkbox(
-            left_frame, "是否成型英雄", self.final_comp_var, row=9
+            left_frame, "不是过度英雄", self.final_comp_var, row=9
         )
 
         self.add_button = tk.Button(

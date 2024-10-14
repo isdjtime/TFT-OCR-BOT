@@ -6,58 +6,58 @@ Items will be placed on the top champion first, and prioritize building items on
 """
 
 COMP = {
-    "\u8d6b\u5361\u91cc\u59c6": {
-        "board_position": 21,
-        "items": ["\u5c0f\u871c\u8702\u7eb9\u7ae0"],
-        "level": 2,
-        "final_comp": True
-    },
-    "\u5854\u59c6": {
-        "board_position": 22,
-        "items": ["\u5723\u76fe\u4f7f\u7684\u8a93\u7ea6", "\u82f1\u96c4\u590d\u5236\u5668", "\u547d\u8fd0\u4e4b\u5b50\u7b26\u5370"],
-        "level": 2,
-        "final_comp": True
-    },
-    "\u5e03\u91cc\u8328": {
-        "board_position": 26,
-        "items": ["\u5195\u536b", "\u72c2\u5f92\u94e0\u7532", "\u79bb\u5b50\u706b\u82b1"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u52aa\u52aa": {
-        "board_position": 27,
-        "items": ["\u7a83\u8d3c\u624b\u5957", "\u6b21\u7ea7\u82f1\u96c4\u590d\u5236\u5668"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u963f\u72f8": {
+    "\u65af\u83ab\u5fb7": {
         "board_position": 0,
-        "items": ["\u6b21\u7ea7\u82f1\u96c4\u590d\u5236\u5668", "\u5c0f\u871c\u8702\u7eb9\u7ae0"],
-        "level": 2,
-        "final_comp": True
-    },
-    "\u6cfd\u62c9\u65af": {
-        "board_position": 2,
-        "items": ["\u5c0f\u871c\u8702\u7eb9\u7ae0"],
+        "items": ["\u65e0\u5c3d\u4e4b\u5203", "\u82f1\u96c4\u590d\u5236\u5668", "\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203", "\u5de8\u4eba\u6740\u624b"],
         "level": 3,
         "final_comp": True
     },
-    "\u5409\u683c\u65af": {
-        "board_position": 4,
-        "items": ["\u84dd\u9738\u7b26", "\u706d\u4e16\u8005\u7684\u6b7b\u4ea1\u4e4b\u5e3d", "\u7eb3\u4ec0\u4e4b\u7259"],
+    "\u97e6\u9c81\u65af": {
+        "board_position": 3,
+        "items": ["\u82f1\u96c4\u590d\u5236\u5668", "\u7a83\u8d3c\u624b\u5957", "\u6362\u5f62\u5e08\u7eb9\u7ae0"],
         "level": 3,
         "final_comp": True
     },
-    "\u514b\u683c\u83ab": {
-        "board_position": 5,
-        "items": ["\u6714\u6781\u4e4b\u77db", "\u7ea2\u9738\u7b26", "\u6b21\u7ea7\u82f1\u96c4\u590d\u5236\u5668"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u7ef4\u8fe6": {
+    "\u8bfa\u59c6\u5e0c": {
         "board_position": 6,
-        "items": [],
+        "items": ["\u6714\u6781\u4e4b\u77db", "\u6b21\u7ea7\u82f1\u96c4\u590d\u5236\u5668", "\u65e0\u5c3d\u4e4b\u5203", "\u6700\u540e\u7684\u8f7b\u8bed"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u65af\u7ef4\u56e0": {
+        "board_position": 16,
+        "items": ["\u9b54\u795e\u4f7f\u8005\u7eb9\u7ae0", "\u5f3a\u88ad\u67aa\u624b\u7eb9\u7ae0", "\u8bc5\u5492\u5973\u5deb\u7eb9\u7ae0"],
         "level": 2,
+        "final_comp": True
+    },
+    "\u4f0a\u8389\u4e1d": {
+        "board_position": 18,
+        "items": ["\u730e\u624b\u7eb9\u7ae0", "\u708e\u9b54\u7eb9\u7ae0", "\u51b0\u971c\u7eb9\u7ae0"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u59ae\u853b": {
+        "board_position": 23,
+        "items": ["\u7a83\u8d3c\u624b\u5957"],
+        "level": 2,
+        "final_comp": True
+    },
+    "\u5185\u745f\u65af": {
+        "board_position": 25,
+        "items": ["\u9501\u5b50\u7532", "\u88c5\u5907\u62c6\u5378\u5668", "\u9501\u5b50\u7532"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u5e0c\u74e6\u5a1c": {
+        "board_position": 26,
+        "items": ["\u77f3\u50cf\u9b3c\u77f3\u677f\u7532", "\u6b21\u7ea7\u82f1\u96c4\u590d\u5236\u5668", "\u82f1\u96c4\u590d\u5236\u5668", "\u6551\u8d4e", "\u5195\u536b"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u8d1d\u857e\u4e9a": {
+        "board_position": 24,
+        "items": ["\u996e\u8840\u5251", "\u82f1\u96c4\u590d\u5236\u5668", "\u65af\u7279\u62c9\u514b\u7684\u6311\u6218\u62a4\u624b", "\u6cf0\u5766\u7684\u575a\u51b3", "\u4e00\u4e2a\u8f7b\u98df\u70b9\u5fc3"],
+        "level": 3,
         "final_comp": True
     }
 }
@@ -77,22 +77,17 @@ COMP = {
 # 强化白名单
 AUGMENTS: list[str] = [
     "潘朵拉的装备",
-    "潘朵拉的备战席",
-    "白银门票",
-    "团队建设",
-    "D个痛快",
-    "辅助魔像",
-    "新人入队",
-    "咒刃",
-    "魔杖",
-    "棱彩门票",
-    "便携锻炉",
-    "大百宝袋",
-    "小蜜蜂之冕",
-    "英勇福袋",
-    "小蜜蜂之徽",
-    "电震攻击",
-    "最佳蜜友",
+    "升星冒险",
+    "换形师之徽",
+    "C位的觉悟",
+    "飞升",
+    "天生二星",
+    "永恒成长",
+    "龙族专精",
+    "殉道者",
+
+
+
 ]
 
 # 魔杖BUFF白名单
@@ -105,6 +100,7 @@ WANDS: list[str] = [
     "快速悬赏",
     "伯爵",
     "巨大化",
+    "降档",
 
     "召唤假人",
     "盾墙",
@@ -144,7 +140,35 @@ WANDS: list[str] = [
 
 # 强化黑名单
 AVOID_AUGMENTS: list[str] = [
-    ""
+    "变形重组器",
+    "运力不足",
+    "精致古董",
+    "金制拆卸器",
+    "节外生枝",
+    "开摆",
+    "重启任务",
+    "开摆",
+    "不是今天",
+    "主打一个陪伴",
+    "碰撞测试假人",
+    "双喜临门",
+    "替罪羊",
+    "辅助宝库",
+    "法师之徽",
+    "命运之子之徽",
+
+    "花仙子之徽",
+    "咖啡甜心之徽",
+    "次元术士之徽",
+    "时间学派之徽",
+
+    "堡垒卫士之徽",
+    "学者之徽",
+    "术师之徽",
+    "重装战士之徽",
+    "复苏者之徽",
+    "狂暴战士之徽",
+    "魔战士之徽",
 ]
 
 
