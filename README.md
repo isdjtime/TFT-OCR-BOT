@@ -10,10 +10,10 @@
 
 1. 从 https://www.python.org/downloads/release/python-3114/ 安装Python3.11.4
 - 请注意，Python 3.11.4不能在Windows 7及更早版本上使用。
-2. 克隆存储库或从这里下载 https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip
+2. 克隆存储库或从这里下载： https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip
 3. 运行 `python install.py` 安装依赖。
 7. 禁用所有游戏内的覆盖
-8. 在CMD中运行main.py文件
+8. 在CMD中运行python.exe .\main.py文件
 
 ## 功能:
 - 读取棋盘状态(回合/等级/金币/商店/物品)
@@ -41,8 +41,10 @@
 
 ## FAQ:
 > ModuleNotFoundError:没有名为` win32gui `的模块
-- 打开命令提示符(cmd)并运行` pip install pywin32 `。
+- 打开命令提示符(cmd)并运行` pip install pywin32`。
+> ModuleNotFoundError:没有名为`(xxx模块名)`的模块
+- 打开命令提示符(cmd)并运行` pip install (xxx模块名)`。
 > 我双击main.py，弹出一个黑窗口并立即关闭。
 - 打开命令提示符(cmd)，将main.py拖放到其中，然后按回车运行它。
-> 机器人表示，它正在移动、购买和销售冠军，但什么也没有发生。
+> 机器人表示，它正在移动、购买和出售英雄,但什么也没有发生。
 - 以管理员权限打开命令提示符(cmd)。
