@@ -16,6 +16,7 @@ ocr = PaddleOCR(lang="ch",  # 默认中文
                             use_space_char=False,
                             use_angle_cls=True,
                             use_mp=settings.USE_MP,
+                            total_process_num=settings.TOTAL_PROCESS_NUM,
                             det_db_score_mode=settings.DET_DB_SCORE_MODE)
 
 def image_grayscale(image: ImageGrab.Image) -> Any:

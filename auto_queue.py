@@ -120,7 +120,7 @@ def get_client() -> tuple:
     got_lock_file = False
     while not got_lock_file:
         game_data = "".join(os.popen(cmd).readlines())
-        if '\n\n\n\n' != game_data:  # No Instance(s) Available. 获取到的数据就是 '\n\n\n\n'
+        if '\n\n\n\n' != game_data:  # No Instance(s) Available.
             app_port: str = re.findall(re_app_port, game_data)[0]
             remoting_auth_token: str = re.findall(re_remoting_auth_token, game_data)[0]
             server_url: str = f"https://127.0.0.1:{app_port}"
@@ -146,15 +146,19 @@ def reconnect(client_info: tuple) -> None:
 def queue() -> None:
     """进入对局的方法"""
     client_info: tuple = get_client()
+    # 检测是否在游戏内
     while check_game_status(client_info) == "InProgress":
         sleep(2)
+    # 检测是否需要重新连接
     if check_game_status(client_info) == "Reconnect":
-        print("  Reconnecting")
+        print("  重新连接游戏")
         reconnect(client_info)
         return
+    # 上面条件都不是 创建一个房间
     while not create_lobby(client_info):
         sleep(3)
 
+    # 修改竞技场皮肤
     change_arena_skin(client_info)
 
     sleep(3)

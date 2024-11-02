@@ -8,12 +8,11 @@
 
 ## 安装:
 
-1. 从 https://www.python.org/downloads/release/python-3114/ 安装Python3.11.4
-- 请注意，Python 3.11.4不能在Windows 7及更早版本上使用。
+1. 从 https://www.python.org/downloads/release/python-3114/ 安装Python3.11.4(
+请注意，Python 3.11.4不能在Windows 7及更早版本上使用)
 2. 克隆存储库或从这里下载： https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip
 3. 运行 `python install.py` 安装依赖。
-7. 禁用所有游戏内的覆盖
-8. 在CMD中运行python.exe .\main.py文件
+4. 在CMD中运行python.exe .\main.py文件
 
 ## 功能:
 - 读取棋盘状态(回合/等级/金币/商店/物品)
@@ -31,8 +30,8 @@
 单击文件打开，或者在终端中使用`python comp_editor.py`(在正确的文件夹中)执行。
 
 ## 待开发:
-- 优先使用相同羁绊过度
-- 更好的金币消费模式
+- ~~优先使用相同羁绊过度~~
+- ~~更好的金币消费模式~~
 - 更好的自动匹配对局和故障监控
 - 从TFT阵容网站上抓取最好的阵容
 - 智能的选秀
@@ -48,3 +47,10 @@
 - 打开命令提示符(cmd)，将main.py拖放到其中，然后按回车运行它。
 > 机器人表示，它正在移动、购买和出售英雄,但什么也没有发生。
 - 以管理员权限打开命令提示符(cmd)。
+
+## 更新日志:
+
+> 2024年11月03日
+- 优化金币消费模式
+- 优先相同羁绊棋子
+- 更好的装备放置

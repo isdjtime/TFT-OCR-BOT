@@ -24,7 +24,7 @@ class Arena:
     def __init__(self, message_queue) -> None:
         self.message_queue = message_queue
         self.board_size = 0
-        self.bench: list[None] = [None] * 9
+        self.bench: list[None] = [None] * 9  # 备战区
         self.anvil_free: list[bool] = [False] * 9
         self.board: list = []
         self.board_unknown: list = []
@@ -60,6 +60,8 @@ class Arena:
                         slot=index,
                         size=game_assets.CHAMPIONS[champ_name]["Board Size"],
                         final_comp=comps.COMP[champ_name]["final_comp"],
+
+
                     )
                     self.champs_to_buy[champ_name] -= 1
                 else:
@@ -78,6 +80,8 @@ class Arena:
         """
             购买英雄 并创建英雄实例
         """
+        # print(f"bought_champion [name]==>{name} ")
+
         self.bench[slot] = Champion(
             name=name,
             coords=screen_coords.BENCH_LOC[slot].get_coords(),
@@ -85,7 +89,11 @@ class Arena:
             slot=slot,
             size=game_assets.CHAMPIONS[name]["Board Size"],
             final_comp=comps.COMP[name]["final_comp"],
+
+
+
         )
+
         mk_functions.move_mouse(screen_coords.DEFAULT_LOC.get_coords())
         sleep(0.5)
         self.fix_bench_state()
@@ -123,6 +131,7 @@ class Arena:
         for index, champion in enumerate(self.bench):
             if isinstance(champion, str):
                 print(f"  移动 {champion} 到棋盘")
+                # print(f"move_unknown Debug =>{index,champion,isinstance(champion, str)}")
                 mk_functions.left_click(screen_coords.BENCH_LOC[index].get_coords())
                 sleep(0.1)
                 mk_functions.left_click(
@@ -157,14 +166,44 @@ class Arena:
             else:
                 bought_unknown = False
                 shop: list = arena_functions.get_shop()
+                count = 0  # 循环计数
                 for champion in shop:
+                    count += 1
+
                     gold: int = arena_functions.get_gold()
+                    # 购买未知英雄
+                    # champion[1] 是英雄名字 champion[0] 是英雄下标
+                    # TODO 代码优化
+                    common = list()  # 获取预设阵容的羁绊信息
+                    for name in self.board_names:
+                        common.append(game_assets.CHAMPIONS[name]["Trait1"])
+                        common.append(game_assets.CHAMPIONS[name]["Trait2"])
+                        common.append(game_assets.CHAMPIONS[name]["Trait3"])
+                    common = set(list(filter(None, common)))
+
+                    hero = list()
+                    if champion[1].__len__() != 0:
+                        hero.append(game_assets.CHAMPIONS[champion[1]]["Trait1"])
+                        hero.append(game_assets.CHAMPIONS[champion[1]]["Trait2"])
+                        hero.append(game_assets.CHAMPIONS[champion[1]]["Trait3"])
+                        hero = list(filter(None, hero))
+
+                    character = False
+                    for group in hero:
+                        character = group in common
+                        break
+
+                    # 如果真的没有相同羁绊的奕子就随机买
+                    if self.level > self.board_size and count == shop.__len__():
+                        character = True
+
                     valid_champ: bool = (
                             champion[1] in game_assets.CHAMPIONS
                             and game_assets.champion_gold_cost(champion[1]) <= gold
                             and game_assets.champion_board_size(champion[1]) == 1
                             and self.champs_to_buy.get(champion[1], -1) < 0
                             and champion[1] not in self.board_unknown
+                            and character
                     )
 
                     if valid_champ:
@@ -243,13 +282,42 @@ class Arena:
 
     def add_item_to_champs(self, item_index: int) -> None:
         """遍历棋盘中的英雄并检查英雄是否需要该装备"""
-
+        # self.board 每个 item.completed_items 是已经完成的装备
+        # self.board 每个 item.current_building[0] 正在构建的装备 item.current_building[1]还缺少的装备
         for champ_name in comps.COMP:
             for champ in self.board:
                 if champ_name == champ.name:
                     if champ.does_need_items() and self.items[item_index] is not None:
                         self.add_item_to_champ(item_index, champ)
+                        #  决赛未成形装备全上
+                        if (arena_functions.get_health() <= settings.HEALTH and settings.RANDOM_ITEM) or (list(filter(None, self.items)).__len__() >= settings.MAX_ITEM and settings.RANDOM_MAX_ITEM):
+
+                            self.any_item_to_champ(item_index, champ)
                     break
+    def any_item_to_champ(self, item_index: int, champ: Champion) -> None:
+        """决赛装备随便上了"""
+        item = self.items[item_index]
+        flag = False
+        if champ.hero_type():
+            if item in game_assets.REAR_ITEMS:
+                mk_functions.left_click(
+                    screen_coords.ITEM_POS[item_index][0].get_coords()
+                )
+                flag = True
+        else:
+            if item in game_assets.FRONTLINE_ITEMS:
+                mk_functions.left_click(
+                    screen_coords.ITEM_POS[item_index][0].get_coords()
+                )
+                flag = True
+
+        if flag:
+            mk_functions.left_click(champ.coords)
+            print(f"  [随机] 装备 {item} 给 {champ.name}")
+            champ.completed_items.append(item)
+
+            self.items[self.items.index(item)] = None
+
 
     def add_item_to_champ(self, item_index: int, champ: Champion) -> None:
         """获取物品的index和champ并装备该装备"""
@@ -336,7 +404,6 @@ class Arena:
                         break
 
     def tacticians_crown_check(self) -> None:
-        print("-----------------tacticians_crown_check-----------------")
         """检测是否从选秀界面获取一个金铲铲冠冕装备"""
         mk_functions.move_mouse(screen_coords.ITEM_POS[0][0].get_coords())
         sleep(0.5)
@@ -355,19 +422,30 @@ class Arena:
             print("  备战区无法获取英雄信息")
 
     def spend_gold(self, speedy=False) -> None:
-        # print("-----------------spend_gold-----------------")
 
         """每回合都消费金币"""
         first_run = True
         min_gold = 100 if speedy else (settings.MIN_GOLD if self.spam_roll else settings.MAX_GOLD)
+        count = 0
+        show_store = False
         while first_run or arena_functions.get_gold() >= min_gold:
+
             if not first_run:
                 if arena_functions.get_level() != 10:
-                    mk_functions.buy_xp()
-                    print("  购买经验")
+                    if arena_functions.get_level() not in settings.UPGRADE_LEVEL:
+                        mk_functions.buy_xp()
+                        print("  小于期望等级 -> 购买经验")
 
-                mk_functions.reroll()
-                print("  刷新商店")
+                        if settings.BUY_EXP_REFRESH_STORE:
+                            mk_functions.reroll()
+                            print("  小于期望等级 -> 刷新商店")
+                            show_store = True
+
+                if arena_functions.get_level() in settings.UPGRADE_LEVEL:
+                    mk_functions.reroll()
+                    print("  刷新商店")
+                    show_store = True
+
             shop: list = arena_functions.get_shop()
 
             # For set 11 encounter round shop delay and choose items popup
@@ -393,7 +471,9 @@ class Arena:
                 else:
                     break
 
-            print(f"  商店: {shop}")
+            if show_store or count == 0:
+                print(f"  商店: {shop}")
+
             for champion in shop:
                 if (
                         self.champs_to_buy.get(champion[1], -1) >= 0
@@ -405,6 +485,11 @@ class Arena:
             # 魔杖BUFF购买
             self.pick_wand()
             first_run = False
+            # 梭哈不要太久
+            count += 1
+            if count >= settings.STORE_COUNT:
+                print(f"  梭哈是一种艺术~")
+                break
 
     def buy_champion(self, champion, quantity) -> None:
 

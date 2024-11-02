@@ -73,6 +73,6 @@ class UI:
         self.root.after(ms=1, func=self.consume_text)
 
     def ui_loop(self) -> None:
-        """Loop that runs indefinetly to process UI changes"""
+        """无限运行以处理UI更改的循环"""
         self.consume_text()
         self.root.mainloop()

@@ -21,3 +21,7 @@ class Champion:
     def does_need_items(self) -> bool:
         """返回 英雄 实例是否需要装备"""
         return len(self.completed_items) != 3 or len(self.build) + len(self.current_building) == 0
+
+    def hero_type(self) -> bool:
+        """获取英雄类型 前排返回False  后排返回True """
+        return 0 <= self.index <= 13

@@ -14,25 +14,25 @@ COMP = {
     },
     "\u97e6\u9c81\u65af": {
         "board_position": 3,
-        "items": ["\u82f1\u96c4\u590d\u5236\u5668", "\u7a83\u8d3c\u624b\u5957", "\u6362\u5f62\u5e08\u7eb9\u7ae0"],
+        "items": ["\u82f1\u96c4\u590d\u5236\u5668","\u7a83\u8d3c\u624b\u5957"],
         "level": 3,
         "final_comp": True
     },
     "\u8bfa\u59c6\u5e0c": {
         "board_position": 6,
-        "items": ["\u6714\u6781\u4e4b\u77db", "\u6b21\u7ea7\u82f1\u96c4\u590d\u5236\u5668", "\u65e0\u5c3d\u4e4b\u5203", "\u6700\u540e\u7684\u8f7b\u8bed"],
+        "items": ["\u6714\u6781\u4e4b\u77db", "\u65e0\u5c3d\u4e4b\u5203", "\u6700\u540e\u7684\u8f7b\u8bed"],
         "level": 3,
         "final_comp": True
     },
     "\u65af\u7ef4\u56e0": {
         "board_position": 16,
-        "items": ["\u9b54\u795e\u4f7f\u8005\u7eb9\u7ae0", "\u5f3a\u88ad\u67aa\u624b\u7eb9\u7ae0", "\u8bc5\u5492\u5973\u5deb\u7eb9\u7ae0"],
+        "items": ["\u9b54\u795e\u4f7f\u8005\u7eb9\u7ae0"],
         "level": 2,
         "final_comp": True
     },
     "\u4f0a\u8389\u4e1d": {
         "board_position": 18,
-        "items": ["\u730e\u624b\u7eb9\u7ae0", "\u708e\u9b54\u7eb9\u7ae0", "\u51b0\u971c\u7eb9\u7ae0"],
+        "items": ["\u730e\u624b\u7eb9\u7ae0"],
         "level": 3,
         "final_comp": True
     },
@@ -101,6 +101,11 @@ WANDS: list[str] = [
     "伯爵",
     "巨大化",
     "降档",
+    "抛硬币",
+    "休战",
+    "贪婪困境",
+
+
 
     "召唤假人",
     "盾墙",
@@ -133,6 +138,7 @@ WANDS: list[str] = [
     "月光仪式",
 
     "丰功伟绩",
+
 
 
 
@@ -173,7 +179,7 @@ AVOID_AUGMENTS: list[str] = [
 
 
 def champions_to_buy() -> dict:
-    """Creates a list of champions to buy during the game"""
+    """返回需要购买英雄的数量 以达到目标星级"""
     champs_to_buy: dict = {}
     for champion, champion_data in COMP.items():
         if champion_data["level"] == 1:
