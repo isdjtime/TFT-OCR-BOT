@@ -11,7 +11,7 @@ import mk_functions
 
 
 def get_round() -> list[str, int]:
-    """Gets the current game round"""
+    """获取当前游戏回合"""
     screen_capture = ImageGrab.grab(bbox=screen_coords.ROUND_POS.get_coords())
     round_three = screen_capture.crop(screen_coords.ROUND_POS_THREE.get_coords())
     game_round: str = ocr.get_text_from_image(image=round_three)
@@ -74,8 +74,8 @@ def get_champ_carousel(tft_round: str) -> None:
     sleep(3)
 
 
-def check_alive() -> bool:  # Refactor this function to use API
-    """Checks the screen to see if player is still alive"""
+def check_alive() -> bool:  # 重构此函数以使用API
+    """检查屏幕看玩家是否还活着"""
     if ocr.get_text(screenxy=screen_coords.EXIT_NOW_POS.get_coords(), scale=3) == '现在退出':
         return False
     return (
@@ -88,7 +88,7 @@ def check_alive() -> bool:  # Refactor this function to use API
 
 
 def exit_game() -> None:
-    """Exits the game"""
+    """退出游戏"""
     mk_functions.left_click(screen_coords.EXIT_NOW_LOC.get_coords())
 
 
@@ -98,7 +98,7 @@ def default_pos() -> None:
 
 
 def forfeit() -> None:
-    """输掉比赛"""
+    """认输"""
     mk_functions.press_esc()
     mk_functions.left_click(screen_coords.SURRENDER_LOC.get_coords())
     sleep(0.1)

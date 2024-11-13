@@ -20,10 +20,10 @@ FORFEIT_TIME = 600  # 多久投降 单位 秒 目前10分钟投降
 """游戏运营设置"""
 MIN_GOLD = 6  # 最小预留金币 开启梭哈后生效
 MAX_GOLD = 56  # 最大多少金币 50吃利息 默认预留56金币
-HEALTH = 38  # 低于生命值开启梭哈模式
-STORE_COUNT = 10  # 梭哈一波 每次连续刷新多少次商店
+HEALTH = 40  # 低于生命值开启梭哈模式
+STORE_COUNT = 8  # 梭哈一波 每次连续刷新多少次商店
 RANDOM_ITEM = True  # 梭哈模式 是否随机给装备
-MAX_ITEM = 8  # 当有 n 个装备后就随机给 装备栏最多10件
+MAX_ITEM = 9  # 当有 n 个装备后就随机给 装备栏最多10件
 RANDOM_MAX_ITEM = True  # 当有 n 个装备后就随机给 开关
-UPGRADE_LEVEL = [5, 8]  # 指定等级回合不购买经验
-BUY_EXP_REFRESH_STORE = False  # 购买经验循环是否刷新商店
+UPGRADE_LEVEL = [8,9,10]  # 指定等级回合不购买经验
+BUY_EXP_REFRESH_STORE = True  # 购买经验循环是否刷新商店

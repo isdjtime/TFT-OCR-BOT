@@ -100,7 +100,7 @@ def change_arena_skin(client_info: tuple) -> bool:
             verify=False,
         )
         if status.status_code == 204:
-            print("  更改竞技场皮肤为:默认")
+            print("  更改棋盘皮肤为:默认")
             return True
         return False
     except ConnectionError:

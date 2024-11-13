@@ -44,7 +44,7 @@ class Game:
         rect = win32gui.GetWindowRect(hwnd)
 
         x_pos = rect[0]
-        y_pos = rect[1]
+        y_pos = rect[1] 
         width = rect[2] - x_pos
         height = rect[3] - y_pos
 

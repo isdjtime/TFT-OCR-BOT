@@ -6,57 +6,81 @@ Items will be placed on the top champion first, and prioritize building items on
 """
 
 COMP = {
-    "\u65af\u83ab\u5fb7": {
-        "board_position": 0,
-        "items": ["\u65e0\u5c3d\u4e4b\u5203", "\u82f1\u96c4\u590d\u5236\u5668", "\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203", "\u5de8\u4eba\u6740\u624b"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u97e6\u9c81\u65af": {
-        "board_position": 3,
-        "items": ["\u82f1\u96c4\u590d\u5236\u5668","\u7a83\u8d3c\u624b\u5957"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u8bfa\u59c6\u5e0c": {
-        "board_position": 6,
-        "items": ["\u6714\u6781\u4e4b\u77db", "\u65e0\u5c3d\u4e4b\u5203", "\u6700\u540e\u7684\u8f7b\u8bed"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u65af\u7ef4\u56e0": {
-        "board_position": 16,
-        "items": ["\u9b54\u795e\u4f7f\u8005\u7eb9\u7ae0"],
+    "\u963f\u5361\u4e3d": {
+        "board_position": 22,
+        "items": [],
         "level": 2,
         "final_comp": True
     },
-    "\u4f0a\u8389\u4e1d": {
-        "board_position": 18,
-        "items": ["\u730e\u624b\u7eb9\u7ae0"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u59ae\u853b": {
-        "board_position": 23,
-        "items": ["\u7a83\u8d3c\u624b\u5957"],
+    "\u5361\u8428\u4e01": {
+        "board_position": 21,
+        "items": [],
         "level": 2,
-        "final_comp": True
+        "final_comp": False
     },
-    "\u5185\u745f\u65af": {
-        "board_position": 25,
-        "items": ["\u9501\u5b50\u7532", "\u88c5\u5907\u62c6\u5378\u5668", "\u9501\u5b50\u7532"],
-        "level": 3,
-        "final_comp": True
+    "\u8d6b\u5361\u91cc\u59c6": {
+        "board_position": 27,
+        "items": [],
+        "level": 2,
+        "final_comp": False
     },
-    "\u5e0c\u74e6\u5a1c": {
+    "\u8d3e\u514b\u65af": {
         "board_position": 26,
-        "items": ["\u77f3\u50cf\u9b3c\u77f3\u677f\u7532", "\u6b21\u7ea7\u82f1\u96c4\u590d\u5236\u5668", "\u82f1\u96c4\u590d\u5236\u5668", "\u6551\u8d4e", "\u5195\u536b"],
+        "items": [],
+        "level": 2,
+        "final_comp": False
+    },
+    "\u827e\u5e0c": {
+        "board_position": 1,
+        "items": [],
+        "level": 2,
+        "final_comp": False
+    },
+    "\u83f2\u5965\u5a1c": {
+        "board_position": 23,
+        "items": ["\u996e\u8840\u5251", "\u6cf0\u5766\u7684\u575a\u51b3", "\u65af\u7279\u62c9\u514b\u7684\u6311\u6218\u62a4\u624b"],
         "level": 3,
         "final_comp": True
     },
-    "\u8d1d\u857e\u4e9a": {
+    "\u5361\u7279\u7433\u5a1c": {
         "board_position": 24,
-        "items": ["\u996e\u8840\u5251", "\u82f1\u96c4\u590d\u5236\u5668", "\u65af\u7279\u62c9\u514b\u7684\u6311\u6218\u62a4\u624b", "\u6cf0\u5766\u7684\u575a\u51b3", "\u4e00\u4e2a\u8f7b\u98df\u70b9\u5fc3"],
+        "items": ["\u6b63\u4e49\u4e4b\u624b", "\u79bb\u5b50\u706b\u82b1", "\u82b1\u4ed9\u738b\u5195"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u6d1b": {
+        "board_position": 25,
+        "items": [],
+        "level": 2,
+        "final_comp": True
+    },
+    "\u5c3c\u83c8": {
+        "board_position": 15,
+        "items": [],
+        "level": 2,
+        "final_comp": True
+    },
+    "\u683c\u6e29": {
+        "board_position": 17,
+        "items": ["\u73e0\u5149\u62a4\u624b", "\u6b63\u4e49\u4e4b\u624b", "\u84dd\u9738\u7b26"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u5df4\u5fb7": {
+        "board_position": 0,
+        "items": [],
+        "level": 2,
+        "final_comp": True
+    },
+    "\u83ab\u7518\u5a1c": {
+        "board_position": 16,
+        "items": ["\u72c2\u66b4\u6218\u58eb\u7eb9\u7ae0", "\u996e\u8840\u5251"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u7c73\u5229\u6b27": {
+        "board_position": 6,
+        "items": [],
         "level": 3,
         "final_comp": True
     }
@@ -76,15 +100,18 @@ COMP = {
 
 # 强化白名单
 AUGMENTS: list[str] = [
+    "狂暴战士之徽",
+    "狂暴战士之冕",
     "潘朵拉的装备",
-    "升星冒险",
-    "换形师之徽",
-    "C位的觉悟",
+    "四费增援",
+    "投资",
+    "漫游训练师",
+    "吾剑听命于您",
+    "同排活力",
+    "双排",
+    "激昂墓志铭",
     "飞升",
     "天生二星",
-    "永恒成长",
-    "龙族专精",
-    "殉道者",
 
 
 
@@ -173,7 +200,6 @@ AVOID_AUGMENTS: list[str] = [
     "术师之徽",
     "重装战士之徽",
     "复苏者之徽",
-    "狂暴战士之徽",
     "魔战士之徽",
 ]
 

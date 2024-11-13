@@ -14,12 +14,13 @@ def show_inform() -> None:
     print("TFT OCR BOT | https://github.com/NatureTao/TFT-OCR-BOT")
     print("关闭此窗口,以结束运行程序!")
     print("加载配置文件 setting.py")
+    print("Set12:魔法大乱斗")
     if settings.QUEUE_ID == 1100:
         game_mode = "排位赛"
     elif settings.QUEUE_ID == 1090:
         game_mode = "匹配赛"
     else:
-        game_mode = f"[注意]当前选择房间ID不是下棋模式|当前ID =>{settings.QUEUE_ID}"
+        game_mode = f"[注意]当前选择房间ID不是(匹配/排位)云顶模式|当前ID =>{settings.QUEUE_ID}"
     print("当前挂机模式:", game_mode)
 
 def game_loop(ui_queue: multiprocessing.Queue) -> None:
@@ -27,10 +28,10 @@ def game_loop(ui_queue: multiprocessing.Queue) -> None:
     while True:
         try:
             auto_queue.queue()
-        except ConnectionError:
-            print("本地服务器连接异常 正常重新连接")
+        except:
+            print("[!]本地游戏服务器连接失败,正在重新连接!")
             time.sleep(1)
-            continue
+
         Game(ui_queue)
 
 

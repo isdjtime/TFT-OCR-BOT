@@ -189,12 +189,18 @@ class Arena:
                         hero = list(filter(None, hero))
 
                     character = False
+                    none = True
+                    priority = 0
                     for group in hero:
-                        character = group in common
-                        break
+                        if group in common:
+                            priority += 1
+                        if priority >= 2:
+                            character = True
+                            none = False
+                            break
 
-                    # 如果真的没有相同羁绊的奕子就随机买
-                    if self.level > self.board_size and count == shop.__len__():
+                            # 如果真的没有相同羁绊的奕子就随机买
+                    if none and self.level > self.board_size or count == shop.__len__():
                         character = True
 
                     valid_champ: bool = (
@@ -255,7 +261,7 @@ class Arena:
                     self.anvil_free[index] = True
 
     def clear_anvil(self) -> None:
-        # print("----------------clear_anvil---------------")
+        # print("----------------消耗铁砧---------------")
         """消耗掉 备战区的武器库 (铁砧)"""
         for index, champion in enumerate(self.bench):
             if champion is None and not self.anvil_free[index]:
@@ -266,8 +272,52 @@ class Arena:
             scale=3
         )
         if anvil_msg == "选择一件":
-            print("  处理备战区武器库")
-            mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
+            anvil_type = True  # True 普通 False 高级
+            arbitrarily = True
+            # 判断铁砧类型
+            while True:
+                items: list = []
+                for coords in screen_coords.ORDINARY_ANVIL_ITEM_POS:
+                    item: str = ocr.get_text(screenxy=coords.get_coords(), scale=3)
+                    items.append(item)
+                if len(list(filter(None, items))) == 4 and '' not in items:
+                    print(" [普通]铁砧")
+                    break
+
+                items.__init__()  # 刷新
+
+                for coords in screen_coords.DIVINE_ANVIL_ITEM_POS:
+                    item: str = ocr.get_text(screenxy=coords.get_coords(), scale=3)
+                    items.append(item)
+                if len(list(filter(None, items))) == 5 and '' not in items:
+                    print(" [高级]铁砧")
+                    anvil_type = False
+                    break
+
+            # 遍历预设英雄列表
+            for champ_name in comps.COMP:
+                # 遍历预设英雄装备
+                for c_item in comps.COMP[champ_name]["items"]:
+                            # 铁砧武器库装备
+                            for item in items:
+                                # 普通
+                                if anvil_type:
+                                    if item in game_assets.FULL_ITEMS[c_item] and arbitrarily:
+                                        mk_functions.left_click(screen_coords.ORDINARY_ANVIL_LOC[items.index(item)].get_coords())
+                                        print(f" 选择[{item}]")
+                                        arbitrarily = False
+                                        break
+                                # 高级
+                                else:
+                                    if item in c_item and arbitrarily:
+                                        mk_functions.left_click(
+                                            screen_coords.DIVINE_ANVIL_LOC[items.index(item)].get_coords())
+                                        print(f" 选择[{item}]")
+                                        arbitrarily = False
+                                        break
+            if arbitrarily:
+                # 实在没有随机选一件
+                mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
             sleep(1)
 
     def place_items(self) -> None:
@@ -289,9 +339,9 @@ class Arena:
                 if champ_name == champ.name:
                     if champ.does_need_items() and self.items[item_index] is not None:
                         self.add_item_to_champ(item_index, champ)
+
                         #  决赛未成形装备全上
                         if (arena_functions.get_health() <= settings.HEALTH and settings.RANDOM_ITEM) or (list(filter(None, self.items)).__len__() >= settings.MAX_ITEM and settings.RANDOM_MAX_ITEM):
-
                             self.any_item_to_champ(item_index, champ)
                     break
     def any_item_to_champ(self, item_index: int, champ: Champion) -> None:
@@ -429,7 +479,7 @@ class Arena:
         count = 0
         show_store = False
         while first_run or arena_functions.get_gold() >= min_gold:
-
+            refresh = True
             if not first_run:
                 if arena_functions.get_level() != 10:
                     if arena_functions.get_level() not in settings.UPGRADE_LEVEL:
@@ -439,9 +489,10 @@ class Arena:
                         if settings.BUY_EXP_REFRESH_STORE:
                             mk_functions.reroll()
                             print("  小于期望等级 -> 刷新商店")
+                            refresh = False
                             show_store = True
 
-                if arena_functions.get_level() in settings.UPGRADE_LEVEL:
+                if refresh and arena_functions.get_level() in settings.UPGRADE_LEVEL:
                     mk_functions.reroll()
                     print("  刷新商店")
                     show_store = True
@@ -449,27 +500,27 @@ class Arena:
             shop: list = arena_functions.get_shop()
 
             # For set 11 encounter round shop delay and choose items popup
-            for _ in range(15):
-                if speedy:
-                    break
-                if all(champ[1] == "" for champ in shop):
-                    print("  奥恩商店～(∠・ω< )⌒☆")
-                    sleep(1)
-                    anvil_msg: str = ocr.get_text(
-                        screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
-                        scale=3
-
-                    )
-                    if anvil_msg in ["选择一件", "手气不错"]:
-                        sleep(2)
-                        print("  选择装备")
-                        mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
-                        sleep(1.5)
-                        shop: list = arena_functions.get_shop()
-                        break
-                    shop: list = arena_functions.get_shop()
-                else:
-                    break
+            # for _ in range(15):
+            #     if speedy:
+            #         break
+            #     if all(champ[1] == "" for champ in shop):
+            #         print("  奥恩商店～(∠・ω< )⌒☆")
+            #         sleep(1)
+            #         anvil_msg: str = ocr.get_text(
+            #             screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
+            #             scale=3
+            #
+            #         )
+            #         if anvil_msg in ["选择一件", "手气不错"]:
+            #             sleep(2)
+            #             print("  选择装备")
+            #             mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
+            #             sleep(1.5)
+            #             shop: list = arena_functions.get_shop()
+            #             break
+            #         shop: list = arena_functions.get_shop()
+            #     else:
+            #         break
 
             if show_store or count == 0:
                 print(f"  商店: {shop}")
@@ -542,7 +593,7 @@ class Arena:
                 )
                 augments.append(augment)
             print(f"  强化符文: {augments}")
-            if len(augments) == 3 and "" not in augments:
+            if len(list(filter(None,augments))) == 3 and '' not in augments:
                 break
 
         for potential in comps.AUGMENTS:

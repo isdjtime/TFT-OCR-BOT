@@ -51,8 +51,9 @@ def get_gold() -> int:
     except ValueError:
         return 0
 
+
 def get_wand() -> str:
-    """获取新赛季魔杖buff"""
+    """获取S12赛季魔杖buff"""
     wand_name: str = ocr.get_text(
         screenxy=screen_coords.WAND_POS.get_coords(),
         scale=3
@@ -61,7 +62,6 @@ def get_wand() -> str:
         return str(wand_name)
     except Exception:
         return ""
-
 
 
 def valid_champ(champ: str) -> str:
@@ -80,12 +80,13 @@ def valid_champ(champ: str) -> str:
 
 
 def get_champ(
-    screen_capture: ImageGrab.Image, name_pos: Vec4, shop_pos: int, shop_array: list
+        screen_capture: ImageGrab.Image, name_pos: Vec4, shop_pos: int, shop_array: list
 ) -> str:
     """返回包含商店位置和冠军名称的元组"""
     champ: str = screen_capture.crop(name_pos.get_coords())
     champ: str = ocr.get_text_from_image(image=champ)
     shop_array.append((shop_pos, valid_champ(champ)))
+
 
 def get_shop() -> list:
     """ 返回商店中的英雄列表 """
@@ -93,7 +94,6 @@ def get_shop() -> list:
     shop: list = []
     thread_list: list = []
     for shop_index, name_pos in enumerate(screen_coords.CHAMP_NAME_POS):
-
         thread = threading.Thread(
 
             target=get_champ, args=(screen_capture, name_pos, shop_index, shop)
@@ -105,6 +105,9 @@ def get_shop() -> list:
     for thread in thread_list:
         thread.join()
     return sorted(shop)
+
+
+# TODO 获取铁砧装备数据
 
 
 def empty_slot() -> int:
@@ -137,7 +140,7 @@ def valid_item(item: str) -> str | None:
             valid_item_name
             for valid_item_name in game_assets.ITEMS
             if valid_item_name in item
-            or SequenceMatcher(a=valid_item_name, b=item).ratio() >= 0.85
+               or SequenceMatcher(a=valid_item_name, b=item).ratio() >= 0.85
         ),
         None,
     )
