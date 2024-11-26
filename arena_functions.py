@@ -22,23 +22,63 @@ def get_level() -> int:
             timeout=10,
             verify=False,
         )
+
         return int(response.json()["activePlayer"]["level"])
     except (requests.exceptions.ConnectionError, KeyError):
         return 1
 
 
-def get_health() -> int:
-    """返回召唤师生命值"""
+# def get_health() -> int:
+#     """返回召唤师生命值"""
+#     try:
+#         response = requests.get(
+#             "https://127.0.0.1:2999/liveclientdata/allgamedata",
+#             timeout=10,
+#             verify=False,
+#         )
+#         return int(response.json()["activePlayer"]["championStats"]["currentHealth"])
+#     except (requests.exceptions.ConnectionError, KeyError):
+#         return -1
+
+def get_alive() -> int:
+    """返回召唤师是否存活"""
     try:
         response = requests.get(
             "https://127.0.0.1:2999/liveclientdata/allgamedata",
             timeout=10,
             verify=False,
         )
-        return int(response.json()["activePlayer"]["championStats"]["currentHealth"])
+        myName = response.json()["activePlayer"]["riotId"]
+        datas = response.json()["allPlayers"]
+        for data in datas:
+            if data["riotId"] == myName:
+                return int(data["scores"]["deaths"])
     except (requests.exceptions.ConnectionError, KeyError):
         return -1
 
+def get_HP() -> list:
+    """返回小小英雄排名和生命值的"""
+    screen_capture = ImageGrab.grab(bbox=screen_coords.HEALTH_POS.get_coords())
+    HP: list = []
+    thread_list: list = []
+    for index, pos in enumerate(screen_coords.HEALTH_ITEM_POS):
+        thread = threading.Thread(
+            target=get_little_hero_health, args=(screen_capture, pos, index, HP)
+        )
+        thread_list.append(thread)
+    for thread in thread_list:
+        thread.start()
+        time.sleep(0.05)
+    for thread in thread_list:
+        thread.join()
+    return HP
+
+def get_little_hero_health(screen_capture: ImageGrab.Image, pos: Vec4, index: int, HP: list):
+    """遍历搜索右边小小英雄血量位置"""
+    little_hero: str = screen_capture.crop(pos.get_coords())
+    little_hero: str = ocr.get_text_from_image(image=little_hero)
+    if little_hero.isnumeric() and len(little_hero) <= 3:
+        HP.append((index + 1, int(little_hero)))
 
 def get_gold() -> int:
     """Returns the gold for the tactician"""
@@ -52,14 +92,26 @@ def get_gold() -> int:
         return 0
 
 
-def get_wand() -> str:
-    """获取S12赛季魔杖buff"""
-    wand_name: str = ocr.get_text(
-        screenxy=screen_coords.WAND_POS.get_coords(),
+def get_abnormal_gold() -> int:
+    """S13 4-6钱包位置"""
+    gold: str = ocr.get_text(
+        screenxy=screen_coords.GOLD_ABNORMAL_POS.get_coords(),
         scale=3
     )
     try:
-        return str(wand_name)
+        return int(gold)
+    except ValueError:
+        return 0
+
+
+def get_abnormal() -> str:
+    """获取S13异常突变buff名称"""
+    abnormal: str = ocr.get_text(
+        screenxy=screen_coords.ABNORMAL_POS.get_coords(),
+        scale=3
+    )
+    try:
+        return str(abnormal)
     except Exception:
         return ""
 
@@ -68,7 +120,6 @@ def valid_champ(champ: str) -> str:
     """将英雄字符串匹配为有效的英雄名称字符串并返回"""
     if champ in game_assets.CHAMPIONS:
         return champ
-
     return next(
         (
             champion
@@ -105,9 +156,6 @@ def get_shop() -> list:
     for thread in thread_list:
         thread.join()
     return sorted(shop)
-
-
-# TODO 获取铁砧装备数据
 
 
 def empty_slot() -> int:
@@ -155,6 +203,9 @@ def get_items() -> list:
             screenxy=positions[1].get_coords(),
             scale=3
         )
-        item_bench.append(valid_item(item))
+        valid = valid_item(item)
+        item_bench.append(valid)
+        if valid is None:
+            break
     mk_functions.move_mouse(screen_coords.DEFAULT_LOC.get_coords())
     return item_bench

@@ -45,7 +45,7 @@ def start_queue(client_info: tuple) -> bool:
             verify=False,
         )
         if status.status_code == 204:
-            print("  匹配中")
+            print("  队列中")
             return True
         return False
     except ConnectionError:
@@ -170,7 +170,7 @@ def queue() -> None:
             start_queue(client_info)
         if state == "ReadyCheck":
             accept_queue(client_info)
-            print("  找到对局")
+            print("  等待其他玩家接受")
         if state == "InProgress":
             return
         sleep(3)
