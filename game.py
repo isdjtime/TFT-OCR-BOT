@@ -1,5 +1,5 @@
 """
-处理每轮游戏中发生的任务
+处理每回合游戏中发生的任务
 """
 
 from time import sleep, perf_counter
@@ -8,6 +8,9 @@ import multiprocessing
 import importlib
 from win32con import BM_CLICK
 import win32gui
+
+import mk_functions
+import screen_coords
 import settings
 import arena_functions
 import game_assets
@@ -16,24 +19,24 @@ from arena import Arena
 from vec4 import Vec4
 from vec2 import Vec2
 
+
 class Game:
-    """Game类，处理游戏逻辑，如轮任务"""
+    """Game类 处理游戏逻辑 每回合"""
 
     def __init__(self, message_queue: multiprocessing.Queue) -> None:
         importlib.reload(game_assets)
         self.message_queue = message_queue
         self.arena = Arena(self.message_queue)
-        self.round: list[str, int] = ["0-0", 0]
+        self.round: list[str,int] = ["0-0",0]
         self.time: None = None
         self.forfeit_time: int = settings.FORFEIT_TIME + random.randint(50, 150)
         self.found_window = False
 
         print("\n[!] 寻找游戏窗口")
         while not self.found_window:
-            print("  没有找到游戏窗口，再次尝试中...")
+            print("  正在寻找游戏窗口...")
             win32gui.EnumWindows(self.callback, None)
-            sleep(2)
-
+            sleep(6)
         self.loading_screen()
 
     def callback(self, hwnd, extra) -> None:  # pylint: disable=unused-argument
@@ -44,7 +47,7 @@ class Game:
         rect = win32gui.GetWindowRect(hwnd)
 
         x_pos = rect[0]
-        y_pos = rect[1] 
+        y_pos = rect[1]
         width = rect[2] - x_pos
         height = rect[3] - y_pos
 
@@ -75,7 +78,7 @@ class Game:
             print(' 发现“连接失败”窗口，试图退出并重新连接')
             if reconnect_button := win32gui.FindWindowEx(hwnd, 0, "Button", None):
                 if cancel_button := win32gui.FindWindowEx(
-                    hwnd, reconnect_button, "Button", None
+                        hwnd, reconnect_button, "Button", None
                 ):
                     print("  退出游戏")
                     win32gui.SendMessage(cancel_button, BM_CLICK, 0, 0)
@@ -92,8 +95,8 @@ class Game:
         last_game_health: int = 100
 
         while True:
-            game_health: int = arena_functions.get_health()
-            if game_health == 0 and last_game_health > 0:
+            game_health: int = arena_functions.get_alive()
+            if game_health == 1 and last_game_health > 0:
                 count: int = 15
                 while count > 0:
                     if not game_functions.check_alive():
@@ -111,8 +114,8 @@ class Game:
             self.round = game_functions.get_round()
 
             if (
-                settings.FORFEIT
-                and perf_counter() - self.start_time > self.forfeit_time
+                    settings.FORFEIT
+                    and perf_counter() - self.start_time > self.forfeit_time
             ):
                 game_functions.forfeit()
                 continue
@@ -136,7 +139,7 @@ class Game:
                     print(f"\n[遇到对局] {self.round[0]}")
                     print("  不执行操作")
                     self.message_queue.put("CLEAR")
-                    self.arena.check_health()
+                    # self.arena.check_health()
                     ran_round: str = self.round[0]
                 if self.round[1] == 1 and self.round[0].split("-")[1] == "1":
                     print("\n[当前回合]")
@@ -196,7 +199,7 @@ class Game:
                 game_assets.ENCOUNTER_ROUNDS.add(
                     self.round[0].split("-")[0] + "-" + str(index + 1)
                 )
-                if index+1 == 2 and 3 <= int(self.round[0].split("-")[0]) <= 4:
+                if index + 1 == 2 and 3 <= int(self.round[0].split("-")[0]) <= 4:
                     game_assets.AUGMENT_ROUNDS.add(
                         self.round[0].split("-")[0] + "-" + str(index + 2)
                     )
@@ -220,7 +223,7 @@ class Game:
         self.message_queue.put("CLEAR")
         if self.round[0] == "3-4":
             self.arena.final_comp = True
-        self.arena.check_health()
+        # self.arena.check_health()
         print("  等待选秀结束")
         game_functions.get_champ_carousel(self.round[0])
 
@@ -229,7 +232,6 @@ class Game:
         print(f"\n[PvE 对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         sleep(0.5)
-
         if self.round[0] in game_assets.AUGMENT_ROUNDS:
             sleep(1)
             self.arena.augment_roll = True
@@ -237,13 +239,21 @@ class Game:
             # Can't purchase champions for a short period after choosing augment
             sleep(2.5)
         if self.round[0] == "1-3":
-            sleep(1.5)
             self.arena.fix_unknown()
             self.arena.anvil_free[1:] = [True] * 8
             self.arena.clear_anvil()
             self.arena.anvil_free[:2] = [True, False]
             self.arena.clear_anvil()
             self.arena.tacticians_crown_check()
+
+        if self.round[0] == "4-6":
+            sleep(0.5)
+            mk_functions.left_click(screen_coords.BOARD_LOC[settings.HERO_COUNTER_INDEX].get_coords())
+            sleep(0.2)
+            mk_functions.left_click(screen_coords.BOARD_LOC[10].get_coords())
+            gold: int = arena_functions.get_abnormal_gold()
+            self.arena.pick_abnormal(gold)
+            sleep(2)
 
         self.arena.fix_bench_state()
         self.arena.spend_gold()
@@ -259,7 +269,10 @@ class Game:
         print(f"\n[PvP 对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         sleep(0.5)
-
+        self.arena.HP = arena_functions.get_HP()
+        if self.arena.HP:
+            print(f" 生命值：{self.arena.HP[0][1]}")
+            print(f" 排名：{self.arena.HP[0][0]}")
         if self.round[0] in game_assets.AUGMENT_ROUNDS:
             sleep(1)
             self.arena.augment_roll = True
@@ -289,6 +302,13 @@ class Game:
 
     def end_round_tasks(self) -> None:
         """Common tasks across rounds that happen at the end"""
-        self.arena.check_health()
+        # self.arena.check_health()
         self.arena.get_label()
         game_functions.default_pos()
+
+
+if __name__ == '__main__':
+    # print(arena_functions.get_health())
+    mk_functions.left_click(screen_coords.BOARD_LOC[settings.HERO_COUNTER_INDEX].get_coords())
+    sleep(0.5)
+    mk_functions.left_click(screen_coords.BOARD_LOC[10].get_coords())

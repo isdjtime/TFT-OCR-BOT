@@ -15,6 +15,15 @@ def left_click(coords: tuple) -> None:
     pydirectinput.mouseUp()
 
 
+def left_click_drag(coords1: tuple,coords2: tuple) -> None:
+    """位置1 点击拖动鼠标到 位置2"""
+    offset: int = random.randint(-3, 3)
+    pydirectinput.moveTo(coords1[0] - offset, coords1[1] - offset)
+    pydirectinput.mouseDown()
+    pydirectinput.moveTo(coords2[0] - offset, coords2[1] - offset)
+    pydirectinput.mouseUp()
+
+
 def right_click(coords: tuple) -> None:
     """Right clicks at argument ones coordinates"""
     offset: int = random.randint(-3, 3)

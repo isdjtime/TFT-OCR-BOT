@@ -83,7 +83,7 @@ def check_alive() -> bool:  # 重构此函数以使用API
                 screenxy=screen_coords.VICTORY_POS.get_coords(),
                 scale=3
             )
-            != '继续观看'
+            != '现在退出'
     )
 
 

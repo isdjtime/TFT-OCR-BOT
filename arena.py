@@ -2,8 +2,11 @@
 处理游戏内部的棋盘/备战区状态
 机器人用于决策的其他变量
 """
-
+import threading
 from time import sleep
+
+from PIL import ImageGrab
+
 import game_assets
 import mk_functions
 import screen_coords
@@ -13,6 +16,7 @@ import comps
 import ocr
 import game_functions
 import arena_functions
+from vec4 import Vec4
 
 
 class Arena:
@@ -36,6 +40,7 @@ class Arena:
         self.level = 0
         self.augment_roll = True
         self.spam_roll = False
+        self.HP: list = [None]
 
     def fix_bench_state(self) -> None:
         """遍历备战区并修复未知的槽位"""
@@ -61,9 +66,9 @@ class Arena:
                         size=game_assets.CHAMPIONS[champ_name]["Board Size"],
                         final_comp=comps.COMP[champ_name]["final_comp"],
 
-
                     )
                     self.champs_to_buy[champ_name] -= 1
+
                 else:
                     print(
                         f" 备战区[{champ_name}]不在升星队列中"
@@ -90,8 +95,6 @@ class Arena:
             size=game_assets.CHAMPIONS[name]["Board Size"],
             final_comp=comps.COMP[name]["final_comp"],
 
-
-
         )
 
         mk_functions.move_mouse(screen_coords.DEFAULT_LOC.get_coords())
@@ -113,9 +116,11 @@ class Arena:
     def move_known(self, champion: Champion) -> None:
         """将英雄移动到棋盘上"""
         print(f"  移动[{champion.name}]到棋盘")
+
         destination: tuple = screen_coords.BOARD_LOC[
             comps.COMP[champion.name]["board_position"]
         ].get_coords()
+
         mk_functions.left_click(champion.coords)
         sleep(0.1)
         mk_functions.left_click(destination)
@@ -261,8 +266,8 @@ class Arena:
                     self.anvil_free[index] = True
 
     def clear_anvil(self) -> None:
-        # print("----------------消耗铁砧---------------")
         """消耗掉 备战区的武器库 (铁砧)"""
+        isAnvil = False
         for index, champion in enumerate(self.bench):
             if champion is None and not self.anvil_free[index]:
                 mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
@@ -271,54 +276,69 @@ class Arena:
             screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
             scale=3
         )
+        items: list = self.get_anvil_items()
         if anvil_msg == "选择一件":
-            anvil_type = True  # True 普通 False 高级
             arbitrarily = True
-            # 判断铁砧类型
-            while True:
-                items: list = []
-                for coords in screen_coords.ORDINARY_ANVIL_ITEM_POS:
-                    item: str = ocr.get_text(screenxy=coords.get_coords(), scale=3)
-                    items.append(item)
-                if len(list(filter(None, items))) == 4 and '' not in items:
-                    print(" [普通]铁砧")
-                    break
-
-                items.__init__()  # 刷新
-
-                for coords in screen_coords.DIVINE_ANVIL_ITEM_POS:
-                    item: str = ocr.get_text(screenxy=coords.get_coords(), scale=3)
-                    items.append(item)
-                if len(list(filter(None, items))) == 5 and '' not in items:
-                    print(" [高级]铁砧")
-                    anvil_type = False
-                    break
-
+            isAnvil = True
             # 遍历预设英雄列表
             for champ_name in comps.COMP:
                 # 遍历预设英雄装备
                 for c_item in comps.COMP[champ_name]["items"]:
-                            # 铁砧武器库装备
-                            for item in items:
-                                # 普通
-                                if anvil_type:
-                                    if item in game_assets.FULL_ITEMS[c_item] and arbitrarily:
-                                        mk_functions.left_click(screen_coords.ORDINARY_ANVIL_LOC[items.index(item)].get_coords())
-                                        print(f" 选择[{item}]")
-                                        arbitrarily = False
-                                        break
-                                # 高级
-                                else:
-                                    if item in c_item and arbitrarily:
-                                        mk_functions.left_click(
-                                            screen_coords.DIVINE_ANVIL_LOC[items.index(item)].get_coords())
-                                        print(f" 选择[{item}]")
-                                        arbitrarily = False
-                                        break
+                    # 铁砧武器库装备
+                    for item in items:
+                        # 普通
+                        if items.__len__() == 4:
+                            if item in game_assets.FULL_ITEMS[c_item] and arbitrarily:
+                                mk_functions.left_click(
+                                    screen_coords.ORDINARY_ANVIL_LOC[items.index(item)].get_coords())
+                                print(f" 选择[{item}]")
+                                arbitrarily = False
+                                break
+                        # 高级
+                        elif items.__len__() == 5:
+                            if item in c_item and arbitrarily:
+                                mk_functions.left_click(
+                                    screen_coords.DIVINE_ANVIL_LOC[items.index(item)].get_coords())
+                                print(f" 选择[{item}]")
+                                arbitrarily = False
+                                break
             if arbitrarily:
-                # 实在没有随机选一件
+                # 快速处理铁砧
+                print(f" 快速选择")
                 mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
-            sleep(1)
+            if isAnvil:
+                sleep(1)
+
+    def get_anvil_items(self) -> list:
+        """返回铁砧上的物品"""
+        screen_capture = ImageGrab.grab(bbox=screen_coords.ANVIL_ITEMS_POS.get_coords())
+        items: list = []
+        thread_list: list = []
+        for index, pos in enumerate(screen_coords.ORDINARY_ANVIL_ITEM_POS):
+            thread = threading.Thread(
+                target=self.get_anvil_item, args=(screen_capture, pos, index, items)
+            )
+            thread_list.append(thread)
+        for index, pos in enumerate(screen_coords.DIVINE_ANVIL_ITEM_POS):
+            thread = threading.Thread(
+                target=self.get_anvil_item, args=(screen_capture, pos, index, items)
+            )
+            thread_list.append(thread)
+
+        for thread in thread_list:
+            thread.start()
+            sleep(0.05)
+        for thread in thread_list:
+            thread.join()
+        return sorted(items)
+
+    def get_anvil_item(self, screen_capture: ImageGrab.Image, pos: Vec4, index: int, items: list):
+        """遍历识别每个铁砧物品"""
+        item: str = screen_capture.crop(pos.get_coords())
+        item: str = ocr.get_text_from_image(image=item)
+        item = arena_functions.valid_item(item)
+        if item is not None:
+            items.append((index, item))
 
     def place_items(self) -> None:
         """
@@ -341,47 +361,78 @@ class Arena:
                         self.add_item_to_champ(item_index, champ)
 
                         #  决赛未成形装备全上
-                        if (arena_functions.get_health() <= settings.HEALTH and settings.RANDOM_ITEM) or (list(filter(None, self.items)).__len__() >= settings.MAX_ITEM and settings.RANDOM_MAX_ITEM):
-                            self.any_item_to_champ(item_index, champ)
-                    break
+                        if self.HP:
+                            if (self.HP[0][1] <= settings.HEALTH and settings.RANDOM_ITEM) or (list(filter(None,
+                                                                                                           self.items)).__len__() >= settings.MAX_ITEM and settings.RANDOM_MAX_ITEM):
+                                self.any_item_to_champ(item_index, champ)
+                            break
+
     def any_item_to_champ(self, item_index: int, champ: Champion) -> None:
         """决赛装备随便上了"""
         item = self.items[item_index]
         flag = False
+        coords1 = None
         if champ.hero_type():
             if item in game_assets.REAR_ITEMS:
-                mk_functions.left_click(
-                    screen_coords.ITEM_POS[item_index][0].get_coords()
-                )
+                coords1 = screen_coords.ITEM_POS[item_index][0].get_coords()
                 flag = True
         else:
             if item in game_assets.FRONTLINE_ITEMS:
-                mk_functions.left_click(
-                    screen_coords.ITEM_POS[item_index][0].get_coords()
-                )
+                coords1 = screen_coords.ITEM_POS[item_index][0].get_coords()
                 flag = True
 
         if flag:
-            mk_functions.left_click(champ.coords)
+            mk_functions.left_click_drag(coords1, champ.coords)
             print(f"  [随机] 装备 {item} 给 {champ.name}")
             champ.completed_items.append(item)
-
-            self.items[self.items.index(item)] = None
-
+            index = self.items.index(item)
+            while index < len(self.items) - 1:
+                self.items[index] = self.items[index + 1]
+                index += 1
+            self.items[index] = None
 
     def add_item_to_champ(self, item_index: int, champ: Champion) -> None:
         """获取物品的index和champ并装备该装备"""
         item = self.items[item_index]
+        similar_item = game_assets.SACRED_MATCHED_GROUP.get(item)
+        # 普通成装
+        if item in champ.build:
+            mk_functions.left_click_drag(screen_coords.ITEM_POS[item_index][0].get_coords(), champ.coords)
+            print(f"  成装 {item} 给 {champ.name}")
+            champ.completed_items.append(item)
+            champ.build.remove(item)
+            index = self.items.index(item)
+            while index < len(self.items) - 1:
+                self.items[index] = self.items[index + 1]
+                index += 1
+            self.items[index] = None
+            return
+
+        # 光明成装
+        if similar_item in champ.build:
+            mk_functions.left_click_drag(screen_coords.ITEM_POS[item_index][0].get_coords(), champ.coords)
+            print(f"  光明成装 {item} 给 {champ.name}")
+            champ.completed_items.append(similar_item)
+            champ.build.remove(similar_item)
+            index = self.items.index(item)
+            while index < len(self.items) - 1:
+                self.items[index] = self.items[index + 1]
+                index += 1
+            self.items[index] = None
+            return
+
         if item in game_assets.FULL_ITEMS:
             if item in champ.build:
-                mk_functions.left_click(
-                    screen_coords.ITEM_POS[item_index][0].get_coords()
-                )
-                mk_functions.left_click(champ.coords)
+                mk_functions.left_click_drag(screen_coords.ITEM_POS[item_index][0].get_coords(), champ.coords)
                 print(f"  装备 {item} 给 {champ.name}")
                 champ.completed_items.append(item)
                 champ.build.remove(item)
-                self.items[self.items.index(item)] = None
+                index = self.items.index(item)
+                while index < len(self.items) - 1:
+                    self.items[index] = self.items[index + 1]
+                    index += 1
+                self.items[index] = None
+
         elif len(champ.current_building) == 0:
             item_to_move: None = None
             for build_item in champ.build:
@@ -394,29 +445,38 @@ class Arena:
                     )
                     champ.build.remove(build_item)
             if item_to_move is not None:
-                mk_functions.left_click(
-                    screen_coords.ITEM_POS[item_index][0].get_coords()
-                )
-                mk_functions.left_click(champ.coords)
+
+                mk_functions.left_click_drag(screen_coords.ITEM_POS[item_index][0].get_coords(), champ.coords)
+
                 print(f"  装备 {item} 给 {champ.name}")
-                self.items[self.items.index(item)] = None
+                # self.items[self.items.index(item)] = None
+                index = self.items.index(item)
+                while index < len(self.items) - 1:
+                    self.items[index] = self.items[index + 1]
+                    index += 1
+                self.items[index] = None
         else:
             for builditem in champ.current_building:
                 if item == builditem[1]:
-                    mk_functions.left_click(
-                        screen_coords.ITEM_POS[item_index][0].get_coords()
-                    )
-                    mk_functions.left_click(champ.coords)
+
+                    mk_functions.left_click_drag(screen_coords.ITEM_POS[item_index][0].get_coords(), champ.coords)
+
                     champ.completed_items.append(builditem[0])
                     champ.current_building.clear()
-                    self.items[self.items.index(item)] = None
+                    # self.items[self.items.index(item)] = None
+                    index = self.items.index(item)
+                    while index < len(self.items) - 1:
+                        self.items[index] = self.items[index + 1]
+                        index += 1
+                    self.items[index] = None
+
                     print(f"  装备 {item} 给 {champ.name}")
                     print(f"  合成 {builditem[0]}")
                     return
 
     def fix_unknown(self) -> None:
         """检查参数1中传递的项是否有效"""
-        sleep(0.25)
+        sleep(0.15)
         mk_functions.press_e(
             screen_coords.BOARD_LOC[self.unknown_slots[0]].get_coords()
         )
@@ -456,7 +516,7 @@ class Arena:
     def tacticians_crown_check(self) -> None:
         """检测是否从选秀界面获取一个金铲铲冠冕装备"""
         mk_functions.move_mouse(screen_coords.ITEM_POS[0][0].get_coords())
-        sleep(0.5)
+        sleep(0.2)
         item: str = ocr.get_text(
             screenxy=screen_coords.ITEM_POS[0][1].get_coords(),
             scale=3
@@ -464,19 +524,17 @@ class Arena:
         item: str = arena_functions.valid_item(item)
         try:
             if ("金铲铲冠冕" in item) or ("金锅锅冠冕" in item) or ("金锅铲冠冕" in item):
-                print("  操作 ==> board_size-= 1")
                 self.board_size -= 1
             else:
                 print(f"{item} 不是冠冕")
         except TypeError:
-            print("  备战区无法获取英雄信息")
+            print("  [!]装备栏没有装备")
 
     def spend_gold(self, speedy=False) -> None:
 
         """每回合都消费金币"""
         first_run = True
         min_gold = 100 if speedy else (settings.MIN_GOLD if self.spam_roll else settings.MAX_GOLD)
-        count = 0
         show_store = False
         while first_run or arena_functions.get_gold() >= min_gold:
             refresh = True
@@ -492,6 +550,15 @@ class Arena:
                             refresh = False
                             show_store = True
 
+                    elif self.champs_to_buy[comps.get_key(comps.COMP,settings.TARGET_HERO_INDEX_SATISFY_GRADE)] == 0:
+                        mk_functions.buy_xp()
+                        print("  C位成型 -> 购买经验")
+                        if settings.BUY_EXP_REFRESH_STORE:
+                            mk_functions.reroll()
+                            print("  C位成型 -> 刷新商店")
+                            refresh = False
+                            show_store = True
+
                 if refresh and arena_functions.get_level() in settings.UPGRADE_LEVEL:
                     mk_functions.reroll()
                     print("  刷新商店")
@@ -499,30 +566,7 @@ class Arena:
 
             shop: list = arena_functions.get_shop()
 
-            # For set 11 encounter round shop delay and choose items popup
-            # for _ in range(15):
-            #     if speedy:
-            #         break
-            #     if all(champ[1] == "" for champ in shop):
-            #         print("  奥恩商店～(∠・ω< )⌒☆")
-            #         sleep(1)
-            #         anvil_msg: str = ocr.get_text(
-            #             screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
-            #             scale=3
-            #
-            #         )
-            #         if anvil_msg in ["选择一件", "手气不错"]:
-            #             sleep(2)
-            #             print("  选择装备")
-            #             mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
-            #             sleep(1.5)
-            #             shop: list = arena_functions.get_shop()
-            #             break
-            #         shop: list = arena_functions.get_shop()
-            #     else:
-            #         break
-
-            if show_store or count == 0:
+            if show_store or first_run:
                 print(f"  商店: {shop}")
 
             for champion in shop:
@@ -533,14 +577,8 @@ class Arena:
                         >= 0
                 ):
                     self.buy_champion(champion, 1)
-            # 魔杖BUFF购买
-            self.pick_wand()
+
             first_run = False
-            # 梭哈不要太久
-            count += 1
-            if count >= settings.STORE_COUNT:
-                print(f"  梭哈是一种艺术~")
-                break
 
     def buy_champion(self, champion, quantity) -> None:
 
@@ -554,7 +592,7 @@ class Arena:
                 self.champs_to_buy[champion[1]] -= quantity
         else:
             # Try to buy champ 3 when bench is full
-            print(f"  备战区快满了但缺少: {champion[1]}")
+            print(f"  备战区已满 无法购买: {champion[1]}")
             mk_functions.left_click(screen_coords.BUY_LOC[champion[0]].get_coords())
             game_functions.default_pos()
             sleep(0.5)
@@ -571,15 +609,19 @@ class Arena:
         if arena_functions.get_gold() >= 4:
             mk_functions.buy_xp()
 
-    def pick_wand(self) -> None:
-        """从用户定义的魔杖优先级列表中选择一个"""
-        wand_name: str = arena_functions.get_wand()
-        for potential in comps.WANDS:
-            if potential in wand_name:
-                print(f"  选择魔杖BUFF {wand_name}")
-                sleep(0.5)
-                mk_functions.left_click(screen_coords.WAND_LOC.get_coords())
-                # return
+    def pick_abnormal(self, gold: int, attempts=settings.MAX_REFRESH_ABNORMAL) -> None:
+        """从用户定义的异常突变优先级列表中选择一个"""
+        abnormalName: str = arena_functions.get_abnormal()
+        for potential in comps.ABRUPT_ANOMALY:
+            if potential in abnormalName and gold >= 1:
+                print(f"  选择异常突变BUFF {abnormalName}")
+                mk_functions.left_click(screen_coords.ABNORMAL_LOC.get_coords())
+                return
+        if gold >= 2 and attempts >= 0:
+            mk_functions.reroll()  # 按下D键刷新BUFF
+            self.pick_abnormal(gold - 1, attempts - 1)
+        print(f" [!]尝试刷新次数已用完")
+        mk_functions.left_click(screen_coords.ABNORMAL_LOC.get_coords())
 
     def pick_augment(self) -> None:
         """从用户定义的强化优先级列表中选择一个强化，或者默认为不在避免列表中的强化"""
@@ -593,7 +635,7 @@ class Arena:
                 )
                 augments.append(augment)
             print(f"  强化符文: {augments}")
-            if len(list(filter(None,augments))) == 3 and '' not in augments:
+            if len(list(filter(None, augments))) == 3 and '' not in augments:
                 break
 
         for potential in comps.AUGMENTS:
@@ -614,7 +656,7 @@ class Arena:
             return
 
         print(
-            "  [!] 没有匹配预设强化符文,默认选择第一个"
+            "  [!] 未找到预设强化符文,默认选择第一个\n  [!] 您可以设置强化符文黑名单"
         )
 
         for augment in augments:
@@ -629,17 +671,6 @@ class Arena:
                 )
                 return
         mk_functions.left_click(screen_coords.AUGMENT_LOC[0].get_coords())
-
-    def check_health(self) -> None:
-        """生命值低于 settings.HEALTH, 梭哈"""
-        health: int = arena_functions.get_health()
-        if health > 0:
-            print(f"  生命值: {health}")
-            if not self.spam_roll and health < settings.HEALTH:
-                print("    生命值低于安全值,开始梭哈")
-                self.spam_roll = True
-        else:
-            print("  获取生命值失败")
 
     def get_label(self) -> None:
         """获取用于在窗口上显示英雄名称UI的标签"""
@@ -657,3 +688,4 @@ class Arena:
             for index, slot in enumerate(self.board_unknown)
         )
         self.message_queue.put(("LABEL", labels))
+

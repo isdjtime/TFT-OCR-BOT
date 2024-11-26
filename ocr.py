@@ -52,7 +52,7 @@ def get_text(screenxy: tuple, scale: int) -> str:
         try:
             result = ocr.ocr(thresholding, cls=True)
         except Exception as e:
-            print("异常:", e)
+            # print("get_text异常:", e)
             return ""
 
     if result[0] is not None:
@@ -72,15 +72,13 @@ def get_text_from_image(image: ImageGrab.Image) -> str:
     if thresholding is not None:
         try:
             result = ocr.ocr(thresholding, cls=True)
+
+        except RuntimeError as e:
+            # print("运行的异常不管")
+            return ""
         except Exception as e:
-            ocr_ex = PaddleOCR(lang="ch",  # 默认中文
-                               show_log=False,
-                               use_gpu=settings.USE_GPU,
-                               use_space_char=False,
-                               use_angle_cls=True,
-                               use_mp=settings.USE_MP,
-                               det_db_score_mode=settings.DET_DB_SCORE_MODE)
-            result = ocr_ex.ocr(thresholding, cls=True)
+            # print("get_text_from_image异常:", e)
+            return ""
 
     if result[0] is not None:
         text = result[0][0][1][0].strip()
