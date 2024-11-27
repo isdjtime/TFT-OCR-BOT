@@ -171,7 +171,7 @@ BUY_LOC: list[Vec2] = [
 ]
 # 物品领取箱
 ITEM_PICKUP_LOC: list[Vec2] = [
-    Vec2(1440, 611),
+    Vec2(1450, 611),
     Vec2(406, 544),
     Vec2(1435, 486),
     Vec2(450, 440),

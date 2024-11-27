@@ -239,11 +239,11 @@ class Game:
             # Can't purchase champions for a short period after choosing augment
             sleep(2.5)
         if self.round[0] == "1-3":
+            sleep(0.5)
             self.arena.fix_unknown()
             self.arena.anvil_free[1:] = [True] * 8
             self.arena.clear_anvil()
             self.arena.anvil_free[:2] = [True, False]
-            self.arena.clear_anvil()
             self.arena.tacticians_crown_check()
 
         if self.round[0] == "4-6":

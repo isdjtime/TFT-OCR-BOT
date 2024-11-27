@@ -276,8 +276,8 @@ class Arena:
             screenxy=screen_coords.ANVIL_MSG_POS.get_coords(),
             scale=3
         )
-        items: list = self.get_anvil_items()
         if anvil_msg == "选择一件":
+            items: list = self.get_anvil_items()
             arbitrarily = True
             isAnvil = True
             # 遍历预设英雄列表
@@ -476,7 +476,7 @@ class Arena:
 
     def fix_unknown(self) -> None:
         """检查参数1中传递的项是否有效"""
-        sleep(0.15)
+        sleep(0.5)
         mk_functions.press_e(
             screen_coords.BOARD_LOC[self.unknown_slots[0]].get_coords()
         )
@@ -536,6 +536,7 @@ class Arena:
         first_run = True
         min_gold = 100 if speedy else (settings.MIN_GOLD if self.spam_roll else settings.MAX_GOLD)
         show_store = False
+        const = 0
         while first_run or arena_functions.get_gold() >= min_gold:
             refresh = True
             if not first_run:
@@ -550,7 +551,7 @@ class Arena:
                             refresh = False
                             show_store = True
 
-                    elif self.champs_to_buy[comps.get_key(comps.COMP,settings.TARGET_HERO_INDEX_SATISFY_GRADE)] == 0:
+                    elif self.champs_to_buy[comps.get_key(comps.COMP, settings.TARGET_HERO_INDEX_SATISFY_GRADE)] == 0:
                         mk_functions.buy_xp()
                         print("  C位成型 -> 购买经验")
                         if settings.BUY_EXP_REFRESH_STORE:
@@ -579,6 +580,10 @@ class Arena:
                     self.buy_champion(champion, 1)
 
             first_run = False
+
+            const += 1
+            if const >= 10:
+                return
 
     def buy_champion(self, champion, quantity) -> None:
 
@@ -688,4 +693,3 @@ class Arena:
             for index, slot in enumerate(self.board_unknown)
         )
         self.message_queue.put(("LABEL", labels))
-
