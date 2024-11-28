@@ -54,7 +54,7 @@ def get_alive() -> int:
             if data["riotId"] == myName:
                 return int(data["scores"]["deaths"])
     except (requests.exceptions.ConnectionError, KeyError):
-        return -1
+        return 1
 
 def get_HP() -> list:
     """返回小小英雄排名和生命值的"""

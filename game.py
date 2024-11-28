@@ -1,7 +1,7 @@
 """
 处理每回合游戏中发生的任务
 """
-
+import time
 from time import sleep, perf_counter
 import random
 import multiprocessing
@@ -106,8 +106,10 @@ class Game:
                     sleep(1)
                     count -= 1
                 break
-            if game_health == -1 and last_game_health > 0:
+            if game_health == 1 and last_game_health > 0:
+                time.sleep(5)
                 self.message_queue.put("CLEAR")
+                game_functions.exit_game()
                 break
             last_game_health = game_health
 

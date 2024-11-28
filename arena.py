@@ -625,8 +625,9 @@ class Arena:
         if gold >= 2 and attempts >= 0:
             mk_functions.reroll()  # 按下D键刷新BUFF
             self.pick_abnormal(gold - 1, attempts - 1)
-        print(f" [!]尝试刷新次数已用完")
-        mk_functions.left_click(screen_coords.ABNORMAL_LOC.get_coords())
+        else:
+            print(f" [!]尝试刷新次数已用完")
+            mk_functions.left_click(screen_coords.ABNORMAL_LOC.get_coords())
 
     def pick_augment(self) -> None:
         """从用户定义的强化优先级列表中选择一个强化，或者默认为不在避免列表中的强化"""
