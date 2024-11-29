@@ -251,7 +251,7 @@ class Arena:
         self.anvil_free: list[bool] = [False] * 9
         for index, champion in enumerate(self.bench):
             if champion == "?" or isinstance(champion, str):
-                print("  出售英雄")
+                print("  出售英雄1")
                 mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
                 self.bench[index] = None
                 self.anvil_free[index] = True
@@ -260,7 +260,7 @@ class Arena:
                         self.champs_to_buy.get(champion.name, -1) < 0
                         and champion.name in self.board_names
                 ):
-                    print("  出售英雄")
+                    print("  出售英雄2")
                     mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
                     self.bench[index] = None
                     self.anvil_free[index] = True
@@ -288,18 +288,18 @@ class Arena:
                     for item in items:
                         # 普通
                         if items.__len__() == 4:
-                            if item in game_assets.FULL_ITEMS[c_item] and arbitrarily:
+                            if item[1] in game_assets.FULL_ITEMS[c_item] and arbitrarily:
                                 mk_functions.left_click(
                                     screen_coords.ORDINARY_ANVIL_LOC[items.index(item)].get_coords())
-                                print(f" 选择[{item}]")
+                                print(f" 选择[{item[1]}]")
                                 arbitrarily = False
                                 break
                         # 高级
                         elif items.__len__() == 5:
-                            if item in c_item and arbitrarily:
+                            if item[1] in c_item and arbitrarily:
                                 mk_functions.left_click(
                                     screen_coords.DIVINE_ANVIL_LOC[items.index(item)].get_coords())
-                                print(f" 选择[{item}]")
+                                print(f" 选择[{item[1]}]")
                                 arbitrarily = False
                                 break
             if arbitrarily:
@@ -628,6 +628,8 @@ class Arena:
         else:
             print(f" [!]尝试刷新次数已用完")
             mk_functions.left_click(screen_coords.ABNORMAL_LOC.get_coords())
+            return
+
 
     def pick_augment(self) -> None:
         """从用户定义的强化优先级列表中选择一个强化，或者默认为不在避免列表中的强化"""

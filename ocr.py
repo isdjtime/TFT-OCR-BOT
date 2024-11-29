@@ -44,7 +44,7 @@ def get_text(screenxy: tuple, scale: int) -> str:
     result = ""
     screenshot = ImageGrab.grab(bbox=screenxy)
     resize = image_resize(screenshot, scale)  # 调整图像大小
-    # resize.save("get_text.png")  # 测试当前图片
+    # resize.save("get_text.png")  # 查看当前图片
     array = image_array(resize)  # 将图像转换成数组
     grayscale = image_grayscale(array)  # 图像转换为灰度，使OCR更容易破译字符
     thresholding = image_thresholding(grayscale)  # 将阈值化应用于图像

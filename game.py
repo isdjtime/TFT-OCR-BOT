@@ -255,7 +255,7 @@ class Game:
             mk_functions.left_click(screen_coords.BOARD_LOC[10].get_coords())
             gold: int = arena_functions.get_abnormal_gold()
             self.arena.pick_abnormal(gold)
-            sleep(2)
+            sleep(3)
 
         self.arena.fix_bench_state()
         self.arena.spend_gold()
@@ -275,6 +275,10 @@ class Game:
         if self.arena.HP:
             print(f" 生命值：{self.arena.HP[0][1]}")
             print(f" 排名：{self.arena.HP[0][0]}")
+            if self.arena.HP[0][1] <= settings.HEALTH:
+                self.arena.spam_roll = True
+            else:
+                self.arena.spam_roll = False
         if self.round[0] in game_assets.AUGMENT_ROUNDS:
             sleep(1)
             self.arena.augment_roll = True

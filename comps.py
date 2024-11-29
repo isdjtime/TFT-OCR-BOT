@@ -44,23 +44,15 @@ COMP = {
     },
     "\u514b\u683c\u83ab": {
         "board_position": 0,
-        "items": ["\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203", "\u6d77\u514b\u65af\u79d1\u6280\u67aa\u5203",
-                  "\u5927\u5929\u4f7f\u4e4b\u6756"],
+        "items": ["\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203", "\u6d77\u514b\u65af\u79d1\u6280\u67aa\u5203", "\u5927\u5929\u4f7f\u4e4b\u6756"],
         "level": 3,
         "final_comp": True
     },
     "\u6cfd\u4e3d": {
         "board_position": 6,
-        "items": ["\u65e0\u5c3d\u4e4b\u5203", "\u65af\u5854\u7f07\u514b\u7535\u5203",
-                  "\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203"],
+        "items": ["\u65e0\u5c3d\u4e4b\u5203", "\u65af\u5854\u7f07\u514b\u7535\u5203", "\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203"],
         "level": 2,
         "final_comp": True
-    },
-    "\u7206\u7206": {
-        "board_position": 1,
-        "items": ["\u5927\u5929\u4f7f\u4e4b\u6756"],
-        "level": 1,
-        "final_comp": False
     },
     "\u5fb7\u83b1\u6587": {
         "board_position": 2,

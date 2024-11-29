@@ -77,9 +77,11 @@ def get_little_hero_health(screen_capture: ImageGrab.Image, pos: Vec4, index: in
     """遍历搜索右边小小英雄血量位置"""
     little_hero: str = screen_capture.crop(pos.get_coords())
     little_hero: str = ocr.get_text_from_image(image=little_hero)
-    if little_hero.isnumeric() and len(little_hero) <= 3:
-        HP.append((index + 1, int(little_hero)))
-
+    try:
+        if little_hero.isnumeric() and 3 >= len(little_hero) == len(str(int(little_hero))) and int(little_hero) <= 100:
+            HP.append((index + 1, int(little_hero)))
+    except ValueError:
+        pass
 def get_gold() -> int:
     """Returns the gold for the tactician"""
     gold: str = ocr.get_text(
