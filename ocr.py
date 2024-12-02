@@ -71,6 +71,7 @@ def get_text_from_image(image: ImageGrab.Image) -> str:
     thresholding = image_thresholding(grayscale)  # 将阈值化应用于图像
     if thresholding is not None:
         try:
+
             result = ocr.ocr(thresholding, cls=True)
 
         except RuntimeError as e:

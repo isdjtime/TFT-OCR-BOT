@@ -20,7 +20,7 @@ COMP = {
     },
     "\u5200\u75a4": {
         "board_position": 23,
-        "items": ["\u72c2\u5f92\u94e0\u7532", "\u77f3\u50cf\u9b3c\u77f3\u677f\u7532", "\u6551\u8d4e"],
+        "items": ["\u72c2\u5f92\u94e0\u7532", "\u77f3\u50cf\u9b3c\u77f3\u677f\u7532", "\u6551\u8d4e","\u5de8\u9f99\u4e4b\u722a","\u6cf0\u5766\u7684\u575a\u51b3"],
         "level": 3,
         "final_comp": True
     },
@@ -200,6 +200,7 @@ AVOID_AUGMENTS: list[str] = [
     "金鳞精粹",
     "假装摸鱼",
     "厄运保护",
+    "克隆设施",
 
 ]
 

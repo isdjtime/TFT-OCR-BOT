@@ -69,10 +69,10 @@ SHOP_POS: Vec4 = Vec4(GameWindow(481, 1039, 1476, 1070))
 # 英雄商店截图位置 0-4
 CHAMP_NAME_POS: list[Vec4] = [
     Vec4(GameWindow(0, 0, 120, 24), use_screen_offset=False),
-    Vec4(GameWindow(201, 2, 320, 24), use_screen_offset=False),
-    Vec4(GameWindow(404, 2, 522, 24), use_screen_offset=False),
-    Vec4(GameWindow(605, 2, 712, 24), use_screen_offset=False),
-    Vec4(GameWindow(805, 2, 912, 24), use_screen_offset=False),
+    Vec4(GameWindow(201, 0, 320, 24), use_screen_offset=False),
+    Vec4(GameWindow(404, 0, 522, 24), use_screen_offset=False),
+    Vec4(GameWindow(605, 0, 712, 24), use_screen_offset=False),
+    Vec4(GameWindow(805, 0, 912, 24), use_screen_offset=False),
 ]
 
 # 生命值
@@ -87,10 +87,15 @@ HEALTH_ITEM_POS: list[Vec4] = [
     Vec4(GameWindow(0, 370, 50, 407), use_screen_offset=False),
     Vec4(GameWindow(0, 442, 50, 480), use_screen_offset=False),
     Vec4(GameWindow(0, 514, 50, 553), use_screen_offset=False),
-
-
 ]
 
+# 地区奇遇点击位置
+PORTAL_AUGMENT_LOC: Vec2 = Vec2(500, 350)
+# 地区奇遇识别位置
+PORTAL_AUGMENT_POS: Vec4 = Vec4(GameWindow(660, 285, 845, 340))
+
+# 回合时间
+REMAINING_TIME_POS: Vec4 = Vec4(GameWindow(1124, 4, 1162, 62))
 
 # 新赛季异常突变BUFF购买位置
 ABNORMAL_POS: Vec4 = Vec4(GameWindow(624, 934, 805, 960))
@@ -108,7 +113,6 @@ GOLD_ABNORMAL_POS: Vec4 = Vec4(GameWindow(1317, 883, 1367, 907))
 ANVIL_MSG_POS: Vec4 = Vec4(GameWindow(818, 838, 932, 859))
 # 铁砧装备栏
 ANVIL_ITEMS_POS: Vec4 = Vec4(GameWindow(265, 987, 1486, 1026))
-
 
 # 普通铁砧列表 偏移x +238
 ORDINARY_ANVIL_ITEM_POS: list[Vec4] = [
@@ -170,16 +174,24 @@ BUY_LOC: list[Vec2] = [
     Vec2(1375, 992),
 ]
 # 物品领取箱
+# ITEM_PICKUP_LOC: list[Vec2] = [
+#     Vec2(1460, 611),
+#     Vec2(406, 544),
+#     Vec2(1435, 486),
+#     Vec2(450, 440),
+#     Vec2(1380, 381),
+#     Vec2(644, 323),
+#     Vec2(1297, 262),
+#     Vec2(590, 215),
+# ]
 ITEM_PICKUP_LOC: list[Vec2] = [
-    Vec2(1460, 611),
-    Vec2(406, 544),
-    Vec2(1435, 486),
-    Vec2(450, 440),
-    Vec2(1380, 381),
-    Vec2(644, 323),
-    Vec2(1297, 262),
-    Vec2(590, 215),
+    Vec2(1490, 605),
+    Vec2(1293, 313),
+    Vec2(1093, 230),
+    Vec2(557, 194),
+    Vec2(683, 309),
 ]
+
 # 板凳LOC
 BENCH_LOC: list[Vec2] = [
     Vec2(425, 777),

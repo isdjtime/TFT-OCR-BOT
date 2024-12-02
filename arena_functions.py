@@ -45,7 +45,7 @@ def get_alive() -> int:
     try:
         response = requests.get(
             "https://127.0.0.1:2999/liveclientdata/allgamedata",
-            timeout=10,
+            timeout=20,
             verify=False,
         )
         myName = response.json()["activePlayer"]["riotId"]
@@ -55,6 +55,7 @@ def get_alive() -> int:
                 return int(data["scores"]["deaths"])
     except (requests.exceptions.ConnectionError, KeyError):
         return 1
+
 
 def get_HP() -> list:
     """返回小小英雄排名和生命值的"""
@@ -73,6 +74,7 @@ def get_HP() -> list:
         thread.join()
     return HP
 
+
 def get_little_hero_health(screen_capture: ImageGrab.Image, pos: Vec4, index: int, HP: list):
     """遍历搜索右边小小英雄血量位置"""
     little_hero: str = screen_capture.crop(pos.get_coords())
@@ -82,6 +84,18 @@ def get_little_hero_health(screen_capture: ImageGrab.Image, pos: Vec4, index: in
             HP.append((index + 1, int(little_hero)))
     except ValueError:
         pass
+
+
+def get_round_remaining_time() -> int:
+    """返回回合剩于时间"""
+    try:
+        second = int(ocr.get_text(screenxy=screen_coords.REMAINING_TIME_POS.get_coords(), scale=3))
+        return second
+    except ValueError:
+        return -1
+
+
+
 def get_gold() -> int:
     """Returns the gold for the tactician"""
     gold: str = ocr.get_text(

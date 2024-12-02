@@ -41,6 +41,29 @@ class Arena:
         self.augment_roll = True
         self.spam_roll = False
         self.HP: list = [None]
+        self.active_portal: str = ""  # 记录回合奇遇
+
+    def portal_augment(self) -> None:
+        """检查区域扩展并相应地设置标志"""
+        mk_functions.right_click(screen_coords.PORTAL_AUGMENT_LOC.get_coords())
+        sleep(1)
+        region = ocr.get_text(
+            screenxy=screen_coords.PORTAL_AUGMENT_POS.get_coords(), scale=3,
+        )
+        self.active_portal = region
+
+        augment_flags = {
+            "基础装备锻造器": "清除锻造器在 回合 1-3",
+            "魔像训练师": "移动魔像到空白位置在 回合 1-4",
+        }
+
+        augment_name = next((name for name in augment_flags if name in region), None)
+
+        if augment_name:
+            flag = augment_flags[augment_name]
+            print(f"  地区奇遇: {region}| {flag}")
+        else:
+            print(f"  地区奇遇: {region}")
 
     def fix_bench_state(self) -> None:
         """遍历备战区并修复未知的槽位"""
@@ -65,7 +88,9 @@ class Arena:
                         slot=index,
                         size=game_assets.CHAMPIONS[champ_name]["Board Size"],
                         final_comp=comps.COMP[champ_name]["final_comp"],
-
+                        trait1=game_assets.CHAMPIONS[champ_name]["Trait1"],
+                        trait2=game_assets.CHAMPIONS[champ_name]["Trait2"],
+                        trait3=game_assets.CHAMPIONS[champ_name]["Trait3"]
                     )
                     self.champs_to_buy[champ_name] -= 1
 
@@ -94,7 +119,9 @@ class Arena:
             slot=slot,
             size=game_assets.CHAMPIONS[name]["Board Size"],
             final_comp=comps.COMP[name]["final_comp"],
-
+            trait1=game_assets.CHAMPIONS[name]["Trait1"],
+            trait2=game_assets.CHAMPIONS[name]["Trait2"],
+            trait3=game_assets.CHAMPIONS[name]["Trait3"]
         )
 
         mk_functions.move_mouse(screen_coords.DEFAULT_LOC.get_coords())
@@ -159,6 +186,11 @@ class Arena:
         """出售备战区所有英雄"""
         return any(isinstance(slot, str) for slot in self.bench)
 
+    def get_traits(self, champion_name):
+        """获取指定英雄的羁绊信息"""
+        traits = [game_assets.CHAMPIONS[champion_name][f"Trait{i}"] for i in range(1, 4)]
+        return set(filter(None, traits))
+
     def move_champions(self) -> None:
         """将英雄移动到棋盘上"""
         self.level: int = arena_functions.get_level()
@@ -178,33 +210,19 @@ class Arena:
                     gold: int = arena_functions.get_gold()
                     # 购买未知英雄
                     # champion[1] 是英雄名字 champion[0] 是英雄下标
-                    # TODO 代码优化
-                    common = list()  # 获取预设阵容的羁绊信息
+                    # 获取预设阵容的羁绊信息
+                    common_traits = set()
                     for name in self.board_names:
-                        common.append(game_assets.CHAMPIONS[name]["Trait1"])
-                        common.append(game_assets.CHAMPIONS[name]["Trait2"])
-                        common.append(game_assets.CHAMPIONS[name]["Trait3"])
-                    common = set(list(filter(None, common)))
+                        common_traits.update(self.get_traits(name))
 
-                    hero = list()
-                    if champion[1].__len__() != 0:
-                        hero.append(game_assets.CHAMPIONS[champion[1]]["Trait1"])
-                        hero.append(game_assets.CHAMPIONS[champion[1]]["Trait2"])
-                        hero.append(game_assets.CHAMPIONS[champion[1]]["Trait3"])
-                        hero = list(filter(None, hero))
+                    # 获取当前英雄的羁绊信息
+                    current_hero_traits = self.get_traits(champion[1]) if champion[1] else set()
 
-                    character = False
-                    none = True
-                    priority = 0
-                    for group in hero:
-                        if group in common:
-                            priority += 1
-                        if priority >= 2:
-                            character = True
-                            none = False
-                            break
+                    # 检查是否有共同的羁绊
+                    character = any(trait in common_traits for trait in current_hero_traits)
+                    none = not character
 
-                            # 如果真的没有相同羁绊的奕子就随机买
+                    # 如果真的没有相同羁绊的奕子就随机买
                     if none and self.level > self.board_size or count == shop.__len__():
                         character = True
 
@@ -251,7 +269,7 @@ class Arena:
         self.anvil_free: list[bool] = [False] * 9
         for index, champion in enumerate(self.bench):
             if champion == "?" or isinstance(champion, str):
-                print("  出售英雄1")
+                print("  出售英雄")
                 mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
                 self.bench[index] = None
                 self.anvil_free[index] = True
@@ -260,7 +278,7 @@ class Arena:
                         self.champs_to_buy.get(champion.name, -1) < 0
                         and champion.name in self.board_names
                 ):
-                    print("  出售英雄2")
+                    print("  出售英雄")
                     mk_functions.press_e(screen_coords.BENCH_LOC[index].get_coords())
                     self.bench[index] = None
                     self.anvil_free[index] = True
@@ -307,6 +325,7 @@ class Arena:
                 print(f" 快速选择")
                 mk_functions.left_click(screen_coords.BUY_LOC[2].get_coords())
             if isAnvil:
+                game_functions.default_pos()
                 sleep(1)
 
     def get_anvil_items(self) -> list:
@@ -395,6 +414,7 @@ class Arena:
         """获取物品的index和champ并装备该装备"""
         item = self.items[item_index]
         similar_item = game_assets.SACRED_MATCHED_GROUP.get(item)
+
         # 普通成装
         if item in champ.build:
             mk_functions.left_click_drag(screen_coords.ITEM_POS[item_index][0].get_coords(), champ.coords)
@@ -406,6 +426,7 @@ class Arena:
                 self.items[index] = self.items[index + 1]
                 index += 1
             self.items[index] = None
+            sleep(0.05)
             return
 
         # 光明成装
@@ -419,7 +440,22 @@ class Arena:
                 self.items[index] = self.items[index + 1]
                 index += 1
             self.items[index] = None
+            sleep(0.05)
             return
+
+        # 移除纹章逻辑
+        if champ.does_need_trait():
+            if champ.check_trait(item):
+                mk_functions.left_click_drag(screen_coords.ITEM_POS[item_index][0].get_coords(), champ.coords)
+                print(f"  {item} 给 {champ.name}")
+                champ.completed_items.append(item)
+                index = self.items.index(item)
+                while index < len(self.items) - 1:
+                    self.items[index] = self.items[index + 1]
+                    index += 1
+                self.items[index] = None
+                sleep(0.05)
+                return
 
         if item in game_assets.FULL_ITEMS:
             if item in champ.build:
@@ -472,6 +508,7 @@ class Arena:
 
                     print(f"  装备 {item} 给 {champ.name}")
                     print(f"  合成 {builditem[0]}")
+                    sleep(0.05)
                     return
 
     def fix_unknown(self) -> None:
@@ -536,11 +573,11 @@ class Arena:
         first_run = True
         min_gold = 100 if speedy else (settings.MIN_GOLD if self.spam_roll else settings.MAX_GOLD)
         show_store = False
-        const = 0
+
         while first_run or arena_functions.get_gold() >= min_gold:
             refresh = True
             if not first_run:
-                if arena_functions.get_level() != 10:
+                if level := arena_functions.get_level() != 10:
                     if arena_functions.get_level() not in settings.UPGRADE_LEVEL:
                         mk_functions.buy_xp()
                         print("  小于期望等级 -> 购买经验")
@@ -554,13 +591,13 @@ class Arena:
                     elif self.champs_to_buy[comps.get_key(comps.COMP, settings.TARGET_HERO_INDEX_SATISFY_GRADE)] == 0:
                         mk_functions.buy_xp()
                         print("  C位成型 -> 购买经验")
-                        if settings.BUY_EXP_REFRESH_STORE:
-                            mk_functions.reroll()
-                            print("  C位成型 -> 刷新商店")
-                            refresh = False
-                            show_store = True
 
-                if refresh and arena_functions.get_level() in settings.UPGRADE_LEVEL:
+                        mk_functions.reroll()
+                        print("  C位成型 -> 刷新商店")
+                        refresh = False
+                        show_store = True
+
+                if refresh and arena_functions.get_level() in settings.UPGRADE_LEVEL or level == 10 or self.spam_roll:
                     mk_functions.reroll()
                     print("  刷新商店")
                     show_store = True
@@ -581,8 +618,8 @@ class Arena:
 
             first_run = False
 
-            const += 1
-            if const >= 10:
+            # 获取回合剩于时间 单位秒 预防超时
+            if arena_functions.get_round_remaining_time() <= 6:
                 return
 
     def buy_champion(self, champion, quantity) -> None:
@@ -621,6 +658,7 @@ class Arena:
             if potential in abnormalName and gold >= 1:
                 print(f"  选择异常突变BUFF {abnormalName}")
                 mk_functions.left_click(screen_coords.ABNORMAL_LOC.get_coords())
+                game_functions.default_pos()
                 return
         if gold >= 2 and attempts >= 0:
             mk_functions.reroll()  # 按下D键刷新BUFF
@@ -628,8 +666,8 @@ class Arena:
         else:
             print(f" [!]尝试刷新次数已用完")
             mk_functions.left_click(screen_coords.ABNORMAL_LOC.get_coords())
+            game_functions.default_pos()
             return
-
 
     def pick_augment(self) -> None:
         """从用户定义的强化优先级列表中选择一个强化，或者默认为不在避免列表中的强化"""

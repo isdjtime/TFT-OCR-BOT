@@ -13,6 +13,9 @@
 2. 克隆存储库或从这里下载： https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip
 3. 运行 `python install.py` 安装依赖。
 4. 在CMD中运行python.exe .\main.py文件
+> 视频教程
+- 采用虚拟环境视频教程：https://www.bilibili.com/video/BV1BPBQY1ED5
+- 采用本地环境视频教程：https://www.bilibili.com/video/BV1gXmNYfEyW
 
 ## 功能:
 - 读取棋盘状态(回合/等级/金币/商店/物品)
@@ -50,6 +53,12 @@
 - 以管理员权限打开命令提示符(cmd)。
 
 ## 更新日志:
+> 2024年12月2日
+- 优化羁绊逻辑
+- 优化拾取战利品速度
+- 新增处理装备栏纹章
+- 判断回合剩余时间
+- 更好的铁砧处理
 > 2024年11月29日
 - 修复程序特定条件下异常卡住
 > 2024年11月28日

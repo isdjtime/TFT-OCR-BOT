@@ -20,9 +20,9 @@ def show_inform() -> None:
         print("[!]自动关机功能已开启!")
     print("S13:双城之战2")
     if settings.QUEUE_ID == 1100:
-        game_mode = "排位赛"
+        game_mode = "排位模式"
     elif settings.QUEUE_ID == 1090:
-        game_mode = "匹配赛"
+        game_mode = "匹配模式"
     else:
         game_mode = f"[注意]当前选择房间ID不是(匹配/排位)云顶模式|当前ID =>{settings.QUEUE_ID}"
     print("当前挂机模式:", game_mode)

@@ -120,6 +120,8 @@ NON_CRAFTABLE_ITEMS: set[str] = {"次级英雄复制器", "英雄复制器", "�
                                  "回收左轮枪",
                                  "回收装置",
                                  "高维传家宝",
+                                 "便携异常点"
+                                 "杰作升级"
                                  }
 # 奥恩装备
 ORNN_ITEMS: set[str] = {"生命盔甲",
@@ -312,7 +314,7 @@ ITEMS: set[str] = BASIC_ITEM.union(COMBINED_ITEMS).union(SUPPORT_ITEM).union(NON
     ORNN_ITEMS).union(SACRED_ITEMS)
 
 # 默认英雄信息 英雄名称:金币:x,占人口容量:x,羁绊1:羁绊信息,羁绊2:羁绊信息,羁绊3:羁绊信息
-CHAMPIONS: dict[str, dict[str, int]] = {
+CHAMPIONS: dict[str, dict[str, int | str]] = {
     "辛吉德": {"Gold": 1, "Board Size": 1, "Trait1": "炼金男爵", "Trait2": "哨兵", "Trait3": ""},
     "阿木木": {"Gold": 1, "Board Size": 1, "Trait1": "海克斯机械", "Trait2": "监察", "Trait3": ""},
     "德莱文": {"Gold": 1, "Board Size": 1, "Trait1": "铁血征服者", "Trait2": "搏击手", "Trait3": ""},
@@ -491,7 +493,14 @@ FULL_ITEMS = {
     "次级英雄复制器": ("次级英雄复制器", "次级英雄复制器"),
     "英雄复制器": ("英雄复制器", "英雄复制器"),
 }
-
+# 铁砧奇遇
+ANVIL_PORTALS: list[str] = [
+    "基础装备锻造器",
+]
+# 假人等奇遇
+DUMMY_PORTALS: list[str] = [
+    "魔像训练师",
+]
 
 def champion_board_size(champion: str) -> int:
     """Takes a string (champion name) and returns board size of champion"""

@@ -111,6 +111,7 @@ class Game:
                 self.message_queue.put("CLEAR")
                 game_functions.exit_game()
                 break
+
             last_game_health = game_health
 
             self.round = game_functions.get_round()
@@ -217,8 +218,9 @@ class Game:
         self.arena.bench[result.index(True)] = "?"
         for _ in range(arena_functions.get_level()):
             self.arena.move_unknown()
+        sleep(2.5)
+        self.arena.portal_augment()
         self.end_round_tasks()
-
     def carousel_round(self) -> None:
         """Handles tasks for carousel rounds"""
         print(f"\n[选秀] {self.round[0]}")
@@ -240,13 +242,11 @@ class Game:
             self.arena.pick_augment()
             # Can't purchase champions for a short period after choosing augment
             sleep(2.5)
-        if self.round[0] == "1-3":
-            sleep(0.5)
-            self.arena.fix_unknown()
-            self.arena.anvil_free[1:] = [True] * 8
-            self.arena.clear_anvil()
-            self.arena.anvil_free[:2] = [True, False]
-            self.arena.tacticians_crown_check()
+        # todo 处理魔像 假人等
+        if self.round[0] == "1-4":
+            if self.arena.active_portal in game_assets.DUMMY_PORTALS:
+                print("处理魔像逻辑 但是作者没实现!")
+                pass
 
         if self.round[0] == "4-6":
             sleep(0.5)
@@ -264,6 +264,19 @@ class Game:
         if self.arena.final_comp:
             self.arena.final_comp_check()
         self.arena.bench_cleanup()
+
+        # 跨回合任务处理铁砧
+        if self.round[0] == "1-3":
+            sleep(1.5)
+            # 判断回合是否给铁砧
+            if self.arena.active_portal in game_assets.ANVIL_PORTALS:
+                # self.arena.fix_unknown()
+                self.arena.anvil_free[1:] = [True] * 8
+                self.arena.clear_anvil()
+                self.arena.anvil_free[:2] = [True, False]
+                self.arena.clear_anvil()
+            self.arena.tacticians_crown_check()
+
         self.end_round_tasks()
 
     def pvp_round(self) -> None:
@@ -271,20 +284,23 @@ class Game:
         print(f"\n[PvP 对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         sleep(0.5)
-        self.arena.HP = arena_functions.get_HP()
-        if self.arena.HP:
-            print(f" 生命值：{self.arena.HP[0][1]}")
-            print(f" 排名：{self.arena.HP[0][0]}")
-            if self.arena.HP[0][1] <= settings.HEALTH:
-                self.arena.spam_roll = True
-            else:
-                self.arena.spam_roll = False
+        if self.round[0] not in game_assets.AUGMENT_ROUNDS:
+            self.arena.HP = arena_functions.get_HP()
+            if self.arena.HP:
+                print(f" 生命值：{self.arena.HP[0][1]}")
+                print(f" 排名：{self.arena.HP[0][0]}")
+
+                if self.arena.HP[0][1] <= settings.HEALTH:
+                    self.arena.spam_roll = True
+                else:
+                    self.arena.spam_roll = False
         if self.round[0] in game_assets.AUGMENT_ROUNDS:
             sleep(1)
             self.arena.augment_roll = True
             self.arena.pick_augment()
             sleep(2.5)
         if self.round[0] in ("2-1", "2-5"):
+            # 买经验
             self.arena.buy_xp_round()
         if self.round[0] in game_assets.PICKUP_ROUNDS:
             print("  拾取战利品")
@@ -307,14 +323,9 @@ class Game:
         self.end_round_tasks()
 
     def end_round_tasks(self) -> None:
-        """Common tasks across rounds that happen at the end"""
+        """跨回合的常见任务发生在最后"""
         # self.arena.check_health()
         self.arena.get_label()
         game_functions.default_pos()
 
 
-if __name__ == '__main__':
-    # print(arena_functions.get_health())
-    mk_functions.left_click(screen_coords.BOARD_LOC[settings.HERO_COUNTER_INDEX].get_coords())
-    sleep(0.5)
-    mk_functions.left_click(screen_coords.BOARD_LOC[10].get_coords())
