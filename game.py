@@ -284,16 +284,7 @@ class Game:
         print(f"\n[PvP 对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         sleep(0.5)
-        if self.round[0] not in game_assets.AUGMENT_ROUNDS:
-            self.arena.HP = arena_functions.get_HP()
-            if self.arena.HP:
-                print(f" 生命值：{self.arena.HP[0][1]}")
-                print(f" 排名：{self.arena.HP[0][0]}")
 
-                if self.arena.HP[0][1] <= settings.HEALTH:
-                    self.arena.spam_roll = True
-                else:
-                    self.arena.spam_roll = False
         if self.round[0] in game_assets.AUGMENT_ROUNDS:
             sleep(1)
             self.arena.augment_roll = True
@@ -325,6 +316,17 @@ class Game:
     def end_round_tasks(self) -> None:
         """跨回合的常见任务发生在最后"""
         # self.arena.check_health()
+        # 获取血量
+        self.arena.HP = arena_functions.get_HP()
+        if self.arena.HP:
+            print(f" 生命值：{self.arena.HP[0][1]}")
+            print(f" 排名：{self.arena.HP[0][0]}")
+            # 判断残血就D
+            if self.arena.HP[0][1] <= settings.HEALTH:
+                self.arena.spam_roll = True
+            else:
+                self.arena.spam_roll = False
+
         self.arena.get_label()
         game_functions.default_pos()
 
