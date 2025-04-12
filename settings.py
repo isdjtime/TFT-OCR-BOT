@@ -5,8 +5,8 @@
 """系统设置"""
 GAME_HWND_NAME = 'League of Legends (TM) Client'  # 检测游戏加载窗口名
 USE_GPU = False  # 英伟达显卡设置 True AMD或其他显卡设置 False
-UI_FONT = '杨任东竹石体-Regular'  # 设置屏幕标记字体 -->  'STCaiyun','Microsoft YaHei'
-UI_COLOR = (249, 203, 139)
+UI_FONT = '杨任东竹石体'  # 设置屏幕标记字体 -->  'STCaiyun','Microsoft YaHei'
+UI_COLOR = (252, 161, 4)  # 设置屏幕字体颜色
 
 """OCR引擎设置"""
 DET_DB_SCORE_MODE = 'fast'  # fast是根据polygon的外接矩形边框内的所有像素计算平均得分，slow是根据原始polygon内的所有像素计算平均得分，计算速度相对较慢一些，但是更加准确一些。
