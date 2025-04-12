@@ -5,7 +5,8 @@
 """系统设置"""
 GAME_HWND_NAME = 'League of Legends (TM) Client'  # 检测游戏加载窗口名
 USE_GPU = False  # 英伟达显卡设置 True AMD或其他显卡设置 False
-UI_FONT = 'Microsoft YaHei'  # 设置屏幕标记字体 -->  'STCaiyun','Microsoft YaHei'
+UI_FONT = '杨任东竹石体-Regular'  # 设置屏幕标记字体 -->  'STCaiyun','Microsoft YaHei'
+UI_COLOR = (249, 203, 139)
 
 """OCR引擎设置"""
 DET_DB_SCORE_MODE = 'fast'  # fast是根据polygon的外接矩形边框内的所有像素计算平均得分，slow是根据原始polygon内的所有像素计算平均得分，计算速度相对较慢一些，但是更加准确一些。
@@ -28,9 +29,9 @@ RANDOM_MAX_ITEM = True  # 装备数量随机上装备开关 True False
 HEALTH = 25  # 生命值达到阈值就随机给装备
 RANDOM_ITEM = True  # 生命值随机上装备开关 True False
 
-UPGRADE_LEVEL = [7, ]  # 指定等级内不购买经验
-TARGET_HERO_INDEX_SATISFY_GRADE = 0  # C位满足预设等级 忽略上面不购买经验 填写C位下标
-BUY_EXP_REFRESH_STORE = False  # 购买经验循环是否刷新商店
+UPGRADE_LEVEL = [8, ]  # 指定等级内不购买经验
+TARGET_HERO_INDEX_SATISFY_GRADE = 5  # C位满足预设等级 忽略上面不购买经验 填写C位下标
+BUY_EXP_REFRESH_STORE = True  # 购买经验循环是否刷新商店
 
 MAX_REFRESH_ABNORMAL = 20  # 4-6异常突变BUFF尝试刷新多少次
-HERO_COUNTER_INDEX = 0  # 附加异常突变BUFF的C位下标
+HERO_COUNTER_INDEX = 5  # C位下标

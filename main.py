@@ -15,10 +15,10 @@ from game import Game
 def show_inform() -> None:
     print("TFT OCR BOT | https://github.com/NatureTao/TFT-OCR-BOT")
     print("关闭此窗口,以结束运行程序!")
-    print("加载配置文件 setting.py")
+    print("加载配置文件 setting.py ")
+    print("S14:赛博之城")
     if settings.AUTO_POWER_OFF:
         print("[!]自动关机功能已开启!")
-    print("S13:双城之战2")
     if settings.QUEUE_ID == 1100:
         game_mode = "排位模式"
     elif settings.QUEUE_ID == 1090:

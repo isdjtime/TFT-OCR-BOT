@@ -7,7 +7,6 @@
 - 如果程序崩溃或无法工作，请先阅读FAQ。如果问题仍然无法解决，~~网上冲浪解决（~~
 
 ## 安装:
-
 1. 从 https://www.python.org/downloads/release/python-3114/ 安装Python3.11.4(
 请注意，Python 3.11.4不能在Windows 7及更早版本上使用)
 2. 克隆存储库或从这里下载： https://github.com/NatureTao/TFT-OCR-BOT/archive/refs/heads/main.zip
@@ -53,6 +52,10 @@
 - 以管理员权限打开命令提示符(cmd)。
 
 ## 更新日志:
+>2025年4月12日
+- 适配S14赛季
+- 更换了新的OCR识别引擎(需要重新安装依赖文件,详情请看[安装教程第3条说明](#安装),第一次运行程序需要下载模型,请开启魔法或官网自行[下载模型](https://www.jaided.ai/easyocr/modelhub/))
+- 一些新赛季特性并未完全适配,如新的强化符文刷新位置按钮变动等
 > 2024年12月2日
 - 优化羁绊逻辑
 - 优化拾取战利品速度

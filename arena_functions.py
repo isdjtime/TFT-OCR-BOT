@@ -3,7 +3,6 @@ Arena类用于获取游戏数据的函数
 """
 import time
 from difflib import SequenceMatcher
-import threading
 from PIL import ImageGrab
 import numpy as np
 import requests
@@ -12,6 +11,8 @@ import ocr
 import game_assets
 import mk_functions
 from vec4 import Vec4
+import threading
+from queue import Queue
 
 
 def get_level() -> int:
@@ -80,7 +81,7 @@ def get_little_hero_health(screen_capture: ImageGrab.Image, pos: Vec4, index: in
     little_hero: str = screen_capture.crop(pos.get_coords())
     little_hero: str = ocr.get_text_from_image(image=little_hero)
     try:
-        if little_hero.isnumeric() and 3 >= len(little_hero) == len(str(int(little_hero))) and int(little_hero) <= 100:
+        if little_hero.isnumeric() and 3 >= len(little_hero) == len(str(int(little_hero))) and int(little_hero) <= 150:
             HP.append((index + 1, int(little_hero)))
     except ValueError:
         pass
@@ -95,12 +96,11 @@ def get_round_remaining_time() -> int:
         return -1
 
 
-
 def get_gold() -> int:
     """Returns the gold for the tactician"""
     gold: str = ocr.get_text(
         screenxy=screen_coords.GOLD_POS.get_coords(),
-        scale=3
+        scale=1
     )
     try:
         return int(gold)
@@ -158,6 +158,7 @@ def get_champ(
 def get_shop() -> list:
     """ 返回商店中的英雄列表 """
     screen_capture = ImageGrab.grab(bbox=screen_coords.SHOP_POS.get_coords())
+    # screen_capture.save("test.png")
     shop: list = []
     thread_list: list = []
     for shop_index, name_pos in enumerate(screen_coords.CHAMP_NAME_POS):
@@ -168,7 +169,7 @@ def get_shop() -> list:
         thread_list.append(thread)
     for thread in thread_list:
         thread.start()
-        time.sleep(0.05)
+        time.sleep(0.01)
     for thread in thread_list:
         thread.join()
     return sorted(shop)
@@ -190,6 +191,7 @@ def bench_occupied_check() -> list:
     bench_occupied: list = []
     for positions in screen_coords.BENCH_HEALTH_POS:
         screen_capture = ImageGrab.grab(bbox=positions.get_coords())
+        # screen_capture.save("screenshot.png", "PNG")
         screenshot_array = np.array(screen_capture)
         is_health_color = np.all(screenshot_array == [0, 255, 18], axis=-1)
         occupied = any(np.convolve(is_health_color.reshape(-1), np.ones(5), mode='valid'))
@@ -198,13 +200,12 @@ def bench_occupied_check() -> list:
 
 
 def valid_item(item: str) -> str | None:
-    """检查参数1中传递的项是否有效"""
+    """检查参数1中传递的项是否有效 检测是否是装备名称"""
     return next(
         (
             valid_item_name
             for valid_item_name in game_assets.ITEMS
-            if valid_item_name in item
-               or SequenceMatcher(a=valid_item_name, b=item).ratio() >= 0.85
+            if valid_item_name in item or SequenceMatcher(a=valid_item_name, b=item).ratio() >= 0.85
         ),
         None,
     )
@@ -217,7 +218,7 @@ def get_items() -> list:
         mk_functions.move_mouse(positions[0].get_coords())
         item: str = ocr.get_text(
             screenxy=positions[1].get_coords(),
-            scale=3
+            scale=1
         )
         valid = valid_item(item)
         item_bench.append(valid)
@@ -225,3 +226,4 @@ def get_items() -> list:
             break
     mk_functions.move_mouse(screen_coords.DEFAULT_LOC.get_coords())
     return item_bench
+

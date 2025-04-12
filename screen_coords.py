@@ -44,7 +44,7 @@ ITEM_POS: list[list] = [
     [Vec2(79, 755), Vec4(GameWindow(178, 795, 341, 828))],
 
 ]
-# 一轮POS
+#回合位置
 ROUND_POS: Vec4 = Vec4(GameWindow(753, 10, 870, 34))
 # 第一轮
 ROUND_POS_ONE: Vec4 = Vec4(GameWindow(0, 0, 40, 24), use_screen_offset=False)
@@ -71,28 +71,28 @@ CHAMP_NAME_POS: list[Vec4] = [
     Vec4(GameWindow(0, 0, 120, 24), use_screen_offset=False),
     Vec4(GameWindow(201, 0, 320, 24), use_screen_offset=False),
     Vec4(GameWindow(404, 0, 522, 24), use_screen_offset=False),
-    Vec4(GameWindow(605, 0, 712, 24), use_screen_offset=False),
-    Vec4(GameWindow(805, 0, 912, 24), use_screen_offset=False),
+    Vec4(GameWindow(605, 0, 750, 24), use_screen_offset=False),
+    Vec4(GameWindow(806, 0, 950, 24), use_screen_offset=False),
 ]
 
 # 生命值
-HEALTH_POS: Vec4 = Vec4(GameWindow(1777, 200, 1828, 747))
-# 每个小小英雄 上10  下8
+HEALTH_POS: Vec4 = Vec4(GameWindow(1760, 200, 1828, 747))
+# 每个小小英雄
 HEALTH_ITEM_POS: list[Vec4] = [
-    Vec4(GameWindow(0, 10, 50, 42), use_screen_offset=False),
-    Vec4(GameWindow(0, 82, 50, 115), use_screen_offset=False),
-    Vec4(GameWindow(0, 154, 50, 188), use_screen_offset=False),
-    Vec4(GameWindow(0, 226, 50, 261), use_screen_offset=False),
-    Vec4(GameWindow(0, 298, 50, 334), use_screen_offset=False),
-    Vec4(GameWindow(0, 370, 50, 407), use_screen_offset=False),
-    Vec4(GameWindow(0, 442, 50, 480), use_screen_offset=False),
-    Vec4(GameWindow(0, 514, 50, 553), use_screen_offset=False),
+    Vec4(GameWindow(0, 10, 68, 42), use_screen_offset=False),
+    Vec4(GameWindow(0, 82, 68, 115), use_screen_offset=False),
+    Vec4(GameWindow(0, 154, 68, 188), use_screen_offset=False),
+    Vec4(GameWindow(0, 226, 68, 261), use_screen_offset=False),
+    Vec4(GameWindow(0, 298, 68, 334), use_screen_offset=False),
+    Vec4(GameWindow(0, 370, 68, 407), use_screen_offset=False),
+    Vec4(GameWindow(0, 442, 68, 480), use_screen_offset=False),
+    Vec4(GameWindow(0, 514, 68, 553), use_screen_offset=False),
 ]
 
 # 地区奇遇点击位置
-PORTAL_AUGMENT_LOC: Vec2 = Vec2(500, 350)
+PORTAL_AUGMENT_LOC: Vec2 = Vec2(809, 11)
 # 地区奇遇识别位置
-PORTAL_AUGMENT_POS: Vec4 = Vec4(GameWindow(660, 285, 845, 340))
+PORTAL_AUGMENT_POS: Vec4 = Vec4(GameWindow(712, 60, 1177, 95))
 
 # 回合时间
 REMAINING_TIME_POS: Vec4 = Vec4(GameWindow(1124, 4, 1162, 62))
@@ -105,7 +105,8 @@ ABNORMAL_LOC: Vec2 = Vec2(1331, 948)
 PANEL_NAME_LOC: Vec4 = Vec4(GameWindow(1707, 320, 1821, 342))
 
 # 钱包位置
-GOLD_POS: Vec4 = Vec4(GameWindow(870, 883, 920, 909))
+GOLD_POS: Vec4 = Vec4(GameWindow(950, 883, 1010, 909))
+
 # 4-6的时候钱包位置
 GOLD_ABNORMAL_POS: Vec4 = Vec4(GameWindow(1317, 883, 1367, 907))
 

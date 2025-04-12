@@ -53,7 +53,7 @@ def start_queue(client_info: tuple) -> bool:
 
 
 def check_queue(client_info: tuple) -> bool:
-    """Checks queue to see if we are searching"""
+    """检查队列，看看我们是否正在搜索"""
     try:
         status = requests.get(
             f"{client_info[1]}/lol-lobby/v2/lobby/matchmaking/search-state",
@@ -67,7 +67,7 @@ def check_queue(client_info: tuple) -> bool:
 
 
 def check_game_status(client_info: tuple) -> bool:
-    """Checks to see if we are in a game"""
+    """检查我们是否在游戏中"""
     try:
         status = requests.get(
             f"{client_info[1]}/lol-gameflow/v1/session",

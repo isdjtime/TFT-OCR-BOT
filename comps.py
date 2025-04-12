@@ -6,57 +6,69 @@ Items will be placed on the top champion first, and prioritize building items on
 """
 
 COMP = {
-    "\u5fb7\u83b1\u5384\u65af": {
+    "\u6ce2\u6bd4": {
         "board_position": 21,
         "items": [],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u96f7\u514b\u987f": {
+        "board_position": 22,
+        "items": ["\u996e\u8840\u5251", "\u65af\u7279\u62c9\u514b\u7684\u6311\u6218\u62a4\u624b", "\u6cf0\u5766\u7684\u575a\u51b3"],
+        "level": 3,
+        "final_comp": True
+    },
+    "\u52a0\u91cc\u5965": {
+        "board_position": 24,
+        "items": [],
+        "level": 2,
+        "final_comp": True
+    },
+    "\u745f\u5e84\u59ae": {
+        "board_position": 25,
+        "items": ["\u65e5\u708e\u6597\u7bf7", "\u5723\u76fe\u4f7f\u7684\u8a93\u7ea6", "\u6551\u8d4e"],
         "level": 2,
         "final_comp": True
     },
     "\u76d6\u4f26": {
-        "board_position": 22,
-        "items": ["\u65e5\u708e\u6597\u7bf7"],
-        "level": 2,
-        "final_comp": True
-    },
-    "\u5200\u75a4": {
-        "board_position": 23,
-        "items": ["\u72c2\u5f92\u94e0\u7532", "\u77f3\u50cf\u9b3c\u77f3\u677f\u7532", "\u6551\u8d4e","\u5de8\u9f99\u4e4b\u722a","\u6cf0\u5766\u7684\u575a\u51b3"],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u963f\u6728\u6728": {
-        "board_position": 24,
-        "items": [],
-        "level": 3,
-        "final_comp": True
-    },
-    "\u8303\u5fb7\u5c14": {
-        "board_position": 25,
+        "board_position": 26,
         "items": [],
         "level": 2,
         "final_comp": True
     },
-    "\u5f17\u62c9\u57fa\u7c73\u5c14": {
+    "\u8d3e\u514b\u65af": {
         "board_position": 27,
         "items": [],
-        "level": 2,
+        "level": 3,
         "final_comp": True
     },
-    "\u514b\u683c\u83ab": {
-        "board_position": 0,
-        "items": ["\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203", "\u6d77\u514b\u65af\u79d1\u6280\u67aa\u5203", "\u5927\u5929\u4f7f\u4e4b\u6756"],
+    "\u4fc4\u6d1b\u4f0a": {
+        "board_position": 15,
+        "items": [],
         "level": 3,
         "final_comp": True
     },
     "\u6cfd\u4e3d": {
-        "board_position": 6,
-        "items": ["\u65e0\u5c3d\u4e4b\u5203", "\u65af\u5854\u7f07\u514b\u7535\u5203", "\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203"],
-        "level": 2,
+        "board_position": 5,
+        "items": ["\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203", "\u6d77\u514b\u65af\u79d1\u6280\u67aa\u5203"],
+        "level": 3,
         "final_comp": True
     },
     "\u5fb7\u83b1\u6587": {
-        "board_position": 2,
-        "items": ["\u9b3c\u7d22\u7684\u72c2\u66b4\u4e4b\u5203"],
+        "board_position": 6,
+        "items": ["\u6700\u540e\u7684\u8f7b\u8bed", "\u65e0\u5c3d\u4e4b\u5203"],
+        "level": 2,
+        "final_comp": True
+    },
+    "\u5343\u73cf": {
+        "board_position": 0,
+        "items": [],
+        "level": 2,
+        "final_comp": False
+    },
+    "\u514b\u683c\u83ab": {
+        "board_position": 1,
+        "items": [],
         "level": 2,
         "final_comp": False
     }
@@ -76,22 +88,19 @@ COMP = {
 
 # 强化白名单
 AUGMENTS: list[str] = [
-    "飓风呼啸",
-    "幸运手套",
-    "玻璃大炮",
-    "巨大伙伴",
-    "健康就是财富",
-    "又一个异常突变",
+    "堡垒卫士之徽"
+    "晶体管"
+    "灵魂连接"
+    "巨大伙伴"
+    "四费增援"
+    "拾荒者"
+    "投资策略"
+    "健康就是财富"
 
 ]
 
 # 异常突变白名单
-ABRUPT_ANOMALY: list[str] = [
-    "千刀斩",
-    "火球",
-    "连杀",
-
-]
+ABRUPT_ANOMALY: list[str] = []
 
 # 强化黑名单
 AVOID_AUGMENTS: list[str] = [
@@ -236,7 +245,3 @@ def get_key(comps, index: int) -> str:
     """
     return next((k for k, v in comps.items() if any(goal == index for goal in v.values())), None)
 
-
-if __name__ == '__main__':
-    res = get_key(COMP, 0)
-    print(res)

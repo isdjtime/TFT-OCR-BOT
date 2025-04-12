@@ -1,37 +1,44 @@
 """
 包含所有与截图转换为字符串相关的代码
 """
-import time
+
 from typing import Any
 import cv2
 import numpy as np
 from PIL import ImageGrab
-from paddleocr import PaddleOCR
+import easyocr
 import settings
 
 """初始化全局飞浆OCR"""
-ocr = PaddleOCR(lang="ch",  # 默认中文
-                            show_log=False,
-                            use_gpu=settings.USE_GPU,
-                            use_space_char=False,
-                            use_angle_cls=True,
-                            use_mp=settings.USE_MP,
-                            total_process_num=settings.TOTAL_PROCESS_NUM,
-                            det_db_score_mode=settings.DET_DB_SCORE_MODE)
+# ocr = PaddleOCR(lang="ch",  # 默认中文
+#                             show_log=False,
+#                             use_gpu=settings.USE_GPU,
+#                             use_space_char=False,
+#                             use_angle_cls=True,
+#                             use_mp=settings.USE_MP,
+#                             total_process_num=settings.TOTAL_PROCESS_NUM,
+#                             det_db_score_mode=settings.DET_DB_SCORE_MODE)
+
+"""初始化全局EasyOCR"""
+reader = easyocr.Reader(['ch_sim'], gpu=settings.USE_GPU, verbose=False)
+
 
 def image_grayscale(image: ImageGrab.Image) -> Any:
     """将图像转换为灰度，使OCR更容易破译字符"""
     return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+
 def image_thresholding(image: ImageGrab.Image) -> Any:
     """将阈值化应用于图像 https://docs.opencv.org/4.x/d7/d4d/tutorial_py_thresholding.html"""
     return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
 
 def image_array(image: ImageGrab.Image) -> Any:
     """将图像转换为数组"""
     image = np.array(image)
     image = image[..., :3]
     return image
+
 
 def image_resize(image: int, scale: int) -> Any:
     """使用参数2中的比例来调整图像的大小"""
@@ -46,33 +53,38 @@ def get_text(screenxy: tuple, scale: int) -> str:
     resize = image_resize(screenshot, scale)  # 调整图像大小
     # resize.save("get_text.png")  # 查看当前图片
     array = image_array(resize)  # 将图像转换成数组
-    grayscale = image_grayscale(array)  # 图像转换为灰度，使OCR更容易破译字符
-    thresholding = image_thresholding(grayscale)  # 将阈值化应用于图像
-    if thresholding is not None:
+    # grayscale = image_grayscale(array)  # 图像转换为灰度，使OCR更容易破译字符
+    # thresholding = image_thresholding(grayscale)  # 将阈值化应用于图像
+    if array is not None:
         try:
-            result = ocr.ocr(thresholding, cls=True)
+            result = reader.readtext(array, add_margin=0.2, text_threshold=0.5)
         except Exception as e:
             # print("get_text异常:", e)
             return ""
 
-    if result[0] is not None:
-        text = result[0][0][1][0].strip()
-        if text is not None:
-            return text
+    if result.__len__() != 0:
+        return result[0][1]
+
     return ""
+
 
 def get_text_from_image(image: ImageGrab.Image) -> str:
     """从图片中获取文本"""
     result = ""
-    resize = image_resize(image, 3)  # 调整图像大小
-    # image.save("get_text_from_image.png") # 测试当前图片
-    array = image_array(resize)  # 将图像转换成数组
-    grayscale = image_grayscale(array)  # 图像转换为灰度，使OCR更容易破译字符
-    thresholding = image_thresholding(grayscale)  # 将阈值化应用于图像
-    if thresholding is not None:
-        try:
 
-            result = ocr.ocr(thresholding, cls=True)
+    resize = image_resize(image, 1)  # 调整图像大小
+    resize2 = image_resize(image, 3)  # 调整图像大小
+
+    # resize.save("get_text_from_image.png")  # 测试当前图片
+
+    array = image_array(resize)  # 将图像转换成数组
+    array2 = image_array(resize2)  # 将图像转换成数组
+
+    if array is not None:
+        try:
+            result = reader.readtext(array, add_margin=0.2, text_threshold=0.5)
+            if result.__len__() == 0:
+                result = reader.readtext(array2, add_margin=0.2, text_threshold=0.5)
 
         except RuntimeError as e:
             # print("运行的异常不管")
@@ -81,8 +93,6 @@ def get_text_from_image(image: ImageGrab.Image) -> str:
             # print("get_text_from_image异常:", e)
             return ""
 
-    if result[0] is not None:
-        text = result[0][0][1][0].strip()
-        if text is not None:
-            return text
+    if result.__len__() != 0:
+        return result[0][1]
     return ""

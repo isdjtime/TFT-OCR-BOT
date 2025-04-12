@@ -2,6 +2,7 @@
 处理游戏内部的棋盘/备战区状态
 机器人用于决策的其他变量
 """
+import math
 import threading
 from time import sleep
 
@@ -45,7 +46,7 @@ class Arena:
 
     def portal_augment(self) -> None:
         """检查区域扩展并相应地设置标志"""
-        mk_functions.right_click(screen_coords.PORTAL_AUGMENT_LOC.get_coords())
+        mk_functions.move_mouse(screen_coords.PORTAL_AUGMENT_LOC.get_coords())
         sleep(1)
         region = ocr.get_text(
             screenxy=screen_coords.PORTAL_AUGMENT_POS.get_coords(), scale=3,
@@ -55,6 +56,7 @@ class Arena:
         augment_flags = {
             "基础装备锻造器": "清除锻造器在 回合 1-3",
             "魔像训练师": "移动魔像到空白位置在 回合 1-4",
+            "黑客:幸运商店": "要做什么操作呢?",
         }
 
         augment_name = next((name for name in augment_flags if name in region), None)
@@ -426,7 +428,7 @@ class Arena:
                 self.items[index] = self.items[index + 1]
                 index += 1
             self.items[index] = None
-            sleep(0.05)
+            sleep(0.01)
             return
 
         # 光明成装
@@ -440,7 +442,7 @@ class Arena:
                 self.items[index] = self.items[index + 1]
                 index += 1
             self.items[index] = None
-            sleep(0.05)
+            sleep(0.01)
             return
 
         # 移除纹章逻辑
@@ -454,7 +456,7 @@ class Arena:
                     self.items[index] = self.items[index + 1]
                     index += 1
                 self.items[index] = None
-                sleep(0.05)
+                sleep(0.01)
                 return
 
         if item in game_assets.FULL_ITEMS:
@@ -512,7 +514,7 @@ class Arena:
                     return
 
     def fix_unknown(self) -> None:
-        """检查参数1中传递的项是否有效"""
+        """解决未知英雄"""
         sleep(0.5)
         mk_functions.press_e(
             screen_coords.BOARD_LOC[self.unknown_slots[0]].get_coords()
@@ -553,10 +555,10 @@ class Arena:
     def tacticians_crown_check(self) -> None:
         """检测是否从选秀界面获取一个金铲铲冠冕装备"""
         mk_functions.move_mouse(screen_coords.ITEM_POS[0][0].get_coords())
-        sleep(0.2)
+        sleep(0.1)
         item: str = ocr.get_text(
             screenxy=screen_coords.ITEM_POS[0][1].get_coords(),
-            scale=3
+            scale=1
         )
         item: str = arena_functions.valid_item(item)
         try:
@@ -717,6 +719,32 @@ class Arena:
                 )
                 return
         mk_functions.left_click(screen_coords.AUGMENT_LOC[0].get_coords())
+
+    def find_blue_buff(self, screenshot=(517, 365, 1415, 699), difference_lv=30) -> int:
+        """查找棋盘上魔像的位置"""
+        d_x = screenshot[0]
+        d_y = screenshot[1]
+        screenshot = ImageGrab.grab(bbox=screenshot)
+        screenshot_pixels = screenshot.load()
+        target_color = (0, 114, 255)  # 魔像颜色
+        for x in range(screenshot.size[0]):
+            for y in range(screenshot.size[1]):
+                pixel_color = screenshot_pixels[x, y]
+                # 计算与目标颜色的差距
+                diff = abs(pixel_color[0] - target_color[0]) + abs(pixel_color[1] - target_color[1]) + abs(
+                    pixel_color[2] - target_color[2])
+                # 判断是否为目标颜色
+                if diff < difference_lv:
+                    # print("坐标--->", x + d_x, y + d_y)
+                    coord = (x + d_x, y + d_y)
+                    return self.find_target_index(coord)
+    def find_target_index(self, xy):
+        """传入x和y 返回棋盘位置下标"""
+        for index, coordinate in enumerate(screen_coords.BOARD_LOC):
+            distance = math.sqrt((coordinate.get_coords()[0] - xy[0]) ** 2 + (coordinate.get_coords()[1] - xy[1]) ** 2)
+            if distance <= 30:
+                return index  # 返回位置
+        return None  # 如果没有匹配的坐标，返回None
 
     def get_label(self) -> None:
         """获取用于在窗口上显示英雄名称UI的标签"""

@@ -27,7 +27,7 @@ class Game:
         importlib.reload(game_assets)
         self.message_queue = message_queue
         self.arena = Arena(self.message_queue)
-        self.round: list[str,int] = ["0-0",0]
+        self.round: list[str, int] = ["0-0", 0]
         self.time: None = None
         self.forfeit_time: int = settings.FORFEIT_TIME + random.randint(50, 150)
         self.found_window = False
@@ -221,6 +221,7 @@ class Game:
         sleep(2.5)
         self.arena.portal_augment()
         self.end_round_tasks()
+
     def carousel_round(self) -> None:
         """Handles tasks for carousel rounds"""
         print(f"\n[选秀] {self.round[0]}")
@@ -246,16 +247,25 @@ class Game:
         if self.round[0] == "1-4":
             if self.arena.active_portal in game_assets.DUMMY_PORTALS:
                 print("处理魔像逻辑 但是作者没实现!")
-                pass
+                index = self.arena.find_blue_buff()  # 返回魔像棋盘位置下标
+                if index is not None:
+                    mk_functions.left_click(screen_coords.BOARD_LOC[index].get_coords())
+                    sleep(0.5)
+                    mk_functions.left_click(
+                        screen_coords.BOARD_LOC[
+                            self.arena.unknown_slots[len(self.arena.board_unknown)]
+                        ].get_coords()
+                    )
+                    self.arena.board_unknown.append("魔像")
 
-        if self.round[0] == "4-6":
-            sleep(0.5)
-            mk_functions.left_click(screen_coords.BOARD_LOC[settings.HERO_COUNTER_INDEX].get_coords())
-            sleep(0.2)
-            mk_functions.left_click(screen_coords.BOARD_LOC[10].get_coords())
-            gold: int = arena_functions.get_abnormal_gold()
-            self.arena.pick_abnormal(gold)
-            sleep(3)
+        # if self.round[0] == "4-6":
+        #     sleep(0.5)
+        #     mk_functions.left_click(screen_coords.BOARD_LOC[settings.HERO_COUNTER_INDEX].get_coords())
+        #     sleep(0.2)
+        #     mk_functions.left_click(screen_coords.BOARD_LOC[10].get_coords())
+        #     gold: int = arena_functions.get_abnormal_gold()
+        #     self.arena.pick_abnormal(gold)
+        #     sleep(3)
 
         self.arena.fix_bench_state()
         self.arena.spend_gold()
@@ -280,7 +290,7 @@ class Game:
         self.end_round_tasks()
 
     def pvp_round(self) -> None:
-        """Handles tasks for PVP rounds"""
+        """处理PVP回合的任务"""
         print(f"\n[PvP 对局] {self.round[0]}")
         self.message_queue.put("CLEAR")
         sleep(0.5)
@@ -299,13 +309,17 @@ class Game:
 
         self.arena.fix_bench_state()
         self.arena.bench_cleanup()
+
         if self.round[0] in game_assets.ANVIL_ROUNDS:
             self.arena.clear_anvil()
+
         self.arena.spend_gold(speedy=self.round[0] in game_assets.PICKUP_ROUNDS)
         self.arena.move_champions()
         self.arena.replace_unknown()
+
         if self.arena.final_comp:
             self.arena.final_comp_check()
+
         self.arena.bench_cleanup()
 
         if self.round[0] in game_assets.ITEM_PLACEMENT_ROUNDS:
@@ -329,5 +343,3 @@ class Game:
 
         self.arena.get_label()
         game_functions.default_pos()
-
-

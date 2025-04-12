@@ -104,3 +104,9 @@ def forfeit() -> None:
     sleep(0.1)
     mk_functions.left_click(screen_coords.SURRENDER_TWO_LOC.get_coords())
     sleep(1)
+
+
+if __name__ == '__main__':
+    while True:
+        print(get_round())
+        sleep(1)
