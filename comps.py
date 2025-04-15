@@ -38,7 +38,7 @@ COMP = {
     },
     "\u8d3e\u514b\u65af": {
         "board_position": 27,
-        "items": [],
+        "items": ["\u65e5\u708e\u6597\u7bf7", "\u5de8\u9f99\u4e4b\u722a", "\u72c2\u5f92\u94e0\u7532"],
         "level": 3,
         "final_comp": True
     },

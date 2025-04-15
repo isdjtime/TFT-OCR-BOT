@@ -64,7 +64,7 @@ class Game:
     def loading_screen(self) -> None:
         """循环，当游戏在加载屏幕时运行"""
         game_functions.default_pos()
-        while game_functions.get_round()[0] != "1-1":
+        while game_functions.get_round()[0] not in game_assets.ROUNDS:
             if self.check_failed_to_connect_window():
                 return
             sleep(1)

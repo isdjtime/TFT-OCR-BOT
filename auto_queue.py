@@ -159,7 +159,7 @@ def queue() -> None:
         sleep(3)
 
     # 修改竞技场皮肤
-    change_arena_skin(client_info)
+    ##  change_arena_skin(client_info)
 
     sleep(3)
 

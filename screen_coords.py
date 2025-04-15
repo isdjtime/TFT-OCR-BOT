@@ -247,6 +247,8 @@ BUY_XP_LOC: Vec2 = Vec2(364, 964)
 REFRESH_LOC: Vec2 = Vec2(364, 1039)
 # 默认的代码行
 DEFAULT_LOC: Vec2 = Vec2(60, 222)
+
+DEFAULT_LOC2: Vec2 = Vec2(965, 570)
 # 健康的地方
 HEALTH_LOC: Vec2 = Vec2(1897, 126)
 # 投降LOC

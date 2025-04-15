@@ -671,6 +671,7 @@ class Arena:
             game_functions.default_pos()
             return
 
+    global_variable = 0
     def pick_augment(self) -> None:
         """从用户定义的强化优先级列表中选择一个强化，或者默认为不在避免列表中的强化"""
 
@@ -682,7 +683,13 @@ class Arena:
                     screenxy=coords.get_coords(), scale=3
                 )
                 augments.append(augment)
-            print(f"  强化符文: {augments}")
+            print(f"  强化符文: {augments}  time {self.global_variable}")
+            if augments[0].isspace() and augments[0].isspace():
+                self.global_variable += 1
+            if self.global_variable >= 3:
+                mk_functions.left_click(screen_coords.DEFAULT_LOC2  .get_coords())
+                self.global_variable = 0
+                return
             if len(list(filter(None, augments))) == 3 and '' not in augments:
                 break
 
